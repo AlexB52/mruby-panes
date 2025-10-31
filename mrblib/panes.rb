@@ -1,0 +1,2 @@
+module Panes
+end
