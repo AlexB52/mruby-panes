@@ -4,68 +4,76 @@ module Panes
   end
 
   class Node
-    attr_reader :id, :parent, :children, :config
-    def initialize(id: nil, parent: nil, children: [], config: {})
+    attr_reader :id, :parent, :children
+    attr_accessor :x, :y, :width, :height
+    def initialize(id: nil, parent: nil, children: [], width: nil, height: nil)
       @id = id
       @parent = parent
       @children = children
       @config = config
+      @x = @y = 0.0
+      @width = width || 0
+      @height = height || 0
     end
 
     def ui(id: nil, width: nil, height: nil, &block)
+      self.children << node = Node.new(id: id, parent: self)
+
       if block
-        raise 'not here yet'
+        block.call(node)
       end
 
-      children << Node.new(
-        id: id,
-        parent: self,
-        children: [],
-        config: {
-          type: :rectangle,
-          x: 0.0,
-          y: 0.0,
-          width: width.to_f,
-          height: height.to_f
+      offset = 0.0
+      children.each do |child|
+        child.x = offset
+        offset += child.width.to_f
+        self.width += child.width.to_f
+        self.height = [self.height, child.height].max
+      end
+
+      if width
+        node.width = width.to_f
+      end
+
+      if height
+        node.height = height.to_f
+      end
+
+      node
+    end
+
+    def to_h
+      {
+        type: :rectangle,
+        bounding_box: {
+          x:      x,
+          y:      y,
+          width:  width,
+          height: height
         }
-      )
+      }
     end
   end
 
   class Layout
-    attr_reader :width, :height
     def initialize(width:, height:)
       @width = width
       @height = height
-      @tree = Node.new(id: "__root__", config: { width: width, height: height })
+      @tree = Node.new(id: "__root__", width: width, height: height)
     end
 
     def ui(**config, &block)
       @tree.ui(**config, &block)
 
-      @tree.children.map do |node|
-        {
-          type: node.config[:type],
-          bounding_box: {
-            x:      node.config[:x],
-            y:      node.config[:y],
-            width:  node.config[:width],
-            height: node.config[:height]
-          }
-        }
+      @tree.children.flat_map do |node|
+        build_commands(node)
       end
     end
     alias :build :ui
 
-    def debug(tree)
-      puts
-      puts <<~DEBUG
-        #{tree.id}
-        #{tree.config.inspect}
-      DEBUG
-
-      tree.children.each do |node|
-        debug(node)
+    def build_commands(node)
+      [node.to_h] + node.children.flat_map do |child|
+        build_commands(child)
       end
     end
   end
