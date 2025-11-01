@@ -10,7 +10,7 @@ module Panes
       @id = id
       @parent = parent
       @children = children
-      @x = @y = 0.0
+      @x = @y = 0
       @width = width || 0
       @height = height || 0
     end
@@ -76,9 +76,17 @@ module Panes
     end
     alias :build :ui
 
-    def build_commands(node)
-      [node.to_h] + node.children.flat_map do |child|
-        build_commands(child)
+    def build_commands(node, offset_x: 0, offset_y: 0)
+      command = node.to_h
+      command[:bounding_box][:x] += offset_x
+      command[:bounding_box][:y] += offset_y
+
+      [command] + node.children.flat_map do |child|
+        build_commands(
+          child,
+          offset_x: command[:bounding_box][:x],
+          offset_y: command[:bounding_box][:y]
+        )
       end
     end
   end
