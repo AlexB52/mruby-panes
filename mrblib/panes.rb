@@ -3,7 +3,15 @@ module Panes
     Layout.new(width: width, height: height)
   end
 
-  Node = Struct.new(:id, :parent, :children, :config, keyword_init: true) do
+  class Node
+    attr_reader :id, :parent, :children, :config
+    def initialize(id: nil, parent: nil, children: [], config: {})
+      @id = id
+      @parent = parent
+      @children = children
+      @config = config
+    end
+
     def ui(id: nil, width: nil, height: nil, &block)
       if block
         raise 'not here yet'
@@ -29,7 +37,7 @@ module Panes
     def initialize(width:, height:)
       @width = width
       @height = height
-      @tree = Node.new(id: "__root__", children: [], config: { width: width, height: height })
+      @tree = Node.new(id: "__root__", config: { width: width, height: height })
     end
 
     def ui(**config, &block)

@@ -1,4 +1,4 @@
-eval(File.read('mrblib/panes.rb'))
+# eval(File.read('mrblib/panes.rb'))
 
 class TestRootWindow < MTest::Unit::TestCase
   def test_fixed_dimensions
