@@ -6,6 +6,7 @@ class TestRootWindow < MTest::Unit::TestCase
 
     assert_equal([
       {
+        id: nil,
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
       }
@@ -22,14 +23,44 @@ class TestRootWindow < MTest::Unit::TestCase
 
     assert_equal([
       {
+        id: nil,
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 60, height: 60 },
       },
       {
+        id: nil,
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
       },
       {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 20, y: 0, width: 30, height: 30 },
+      }
+    ], commands)
+  end
+
+  def test_with_nested_elements_with_fit_width
+    layout = Panes.init(width: 60, height: 60)
+
+    commands = layout.build(id: 'root') do |l|
+      l.ui(id: 'one', width: 20, height: 20)
+      l.ui(id: 'two', width: 30, height: 30)
+    end
+
+    assert_equal([
+      {
+        id: 'root',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 50, height: 30 },
+      },
+      {
+        id: 'one',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 20, height: 20 },
+      },
+      {
+        id: 'two',
         type: :rectangle,
         bounding_box: { x: 20, y: 0, width: 30, height: 30 },
       }

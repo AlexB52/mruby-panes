@@ -16,18 +16,19 @@ module Panes
     end
 
     def ui(id: nil, width: nil, height: nil, &block)
-      self.children << node = Node.new(id: id, parent: self)
+      node = Node.new(id: id, parent: self)
+      self.children << node
 
       if block
         block.call(node)
       end
 
-      offset = 0.0
-      children.each do |child|
+      offset = 0
+      node.children.each do |child|
         child.x = offset
         offset += child.width
-        self.width += child.width
-        self.height = [self.height, child.height].max
+        node.width += child.width
+        node.height = [node.height, child.height].max
       end
 
       if width
@@ -41,8 +42,13 @@ module Panes
       node
     end
 
+    def inspect
+      to_h
+    end
+
     def to_h
       {
+        id: id,
         type: :rectangle,
         bounding_box: {
           x:      x,
