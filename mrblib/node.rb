@@ -17,7 +17,7 @@ module Panes
       self.children << node = Node.new(id: id, parent: self)
 
       if block
-        block.call(node)
+        node.instance_eval(&block)
       end
 
       content_width = 0
