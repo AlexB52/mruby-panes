@@ -11,7 +11,7 @@ module Panes
       @height = height || 0
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, &block)
       padding_values = Padding[*padding]
 
       self.children << node = Node.new(id: id, parent: self)
@@ -22,10 +22,14 @@ module Panes
 
       content_width = 0
       tallest_child = 0
-      node.children.each do |child|
+      gap = child_gap || 0
+      last_index = node.children.length - 1
+
+      node.children.each_with_index do |child, index|
         child.x = padding_values[:left] + content_width
         child.y = padding_values[:top]
         content_width += child.width
+        content_width += gap if index < last_index
         tallest_child = [tallest_child, child.height].max
       end
 
