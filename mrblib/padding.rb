@@ -4,13 +4,13 @@ module Panes
 =begin
     This method takes n number of arguments but expects no more than 4.
     It follows CSS padding definitions
-      * padding: 1;          <=> Clay::Padding[1]
-      * padding: 1, 2;       <=> Clay::Padding[1, 2]
-      * padding: 1, 2, 3;    <=> Clay::Padding[1, 2, 3]
-      * padding: 1, 2, 3, 4; <=> Clay::Padding[1, 2, 3, 4]
+      * padding: 1;          <=> Panes::Padding[1]
+      * padding: 1, 2;       <=> Panes::Padding[1, 2]
+      * padding: 1, 2, 3;    <=> Panes::Padding[1, 2, 3]
+      * padding: 1, 2, 3, 4; <=> Panes::Padding[1, 2, 3, 4]
 
     Usage:
-      Clay::Padding[2, 3]
+      Panes::Padding[2, 3]
       => {top: 2, right: 3, bottom: 2, left: 3}
 =end
     def self.[](*args)
