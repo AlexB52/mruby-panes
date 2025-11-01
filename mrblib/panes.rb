@@ -35,16 +35,12 @@ module Panes
 
       node.width = [
         width || 0,
-        padding_values[:left] +
-        content_width +
-        padding_values[:right]
+        padding_values[:left] + content_width + padding_values[:right]
       ].max
 
       node.height = [
         height || 0,
-        padding_values[:top] +
-        tallest_child +
-        padding_values[:bottom]
+        padding_values[:top] + tallest_child + padding_values[:bottom]
       ].max
 
       node
