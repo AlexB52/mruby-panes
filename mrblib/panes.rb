@@ -10,7 +10,6 @@ module Panes
       @id = id
       @parent = parent
       @children = children
-      @config = config
       @x = @y = 0.0
       @width = width || 0
       @height = height || 0
