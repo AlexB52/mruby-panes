@@ -7,7 +7,7 @@ class TestRootWindow < MTest::Unit::TestCase
     assert_equal([
       {
         type: :rectangle,
-        bounding_box: { x: 0.0, y: 0.0, width: 20.0, height: 20.0 },
+        bounding_box: { x: 0, y: 0, width: 20, height: 20 },
       }
     ], commands)
   end
@@ -23,15 +23,15 @@ class TestRootWindow < MTest::Unit::TestCase
     assert_equal([
       {
         type: :rectangle,
-        bounding_box: { x: 0.0, y: 0.0, width: 60.0, height: 60.0 },
+        bounding_box: { x: 0, y: 0, width: 60, height: 60 },
       },
       {
         type: :rectangle,
-        bounding_box: { x: 0.0, y: 0.0, width: 20.0, height: 20.0 },
+        bounding_box: { x: 0, y: 0, width: 20, height: 20 },
       },
       {
         type: :rectangle,
-        bounding_box: { x: 20.0, y: 0.0, width: 30.0, height: 30.0 },
+        bounding_box: { x: 20, y: 0, width: 30, height: 30 },
       }
     ], commands)
   end

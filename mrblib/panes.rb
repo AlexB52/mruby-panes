@@ -25,17 +25,17 @@ module Panes
       offset = 0.0
       children.each do |child|
         child.x = offset
-        offset += child.width.to_f
-        self.width += child.width.to_f
+        offset += child.width
+        self.width += child.width
         self.height = [self.height, child.height].max
       end
 
       if width
-        node.width = width.to_f
+        node.width = width
       end
 
       if height
-        node.height = height.to_f
+        node.height = height
       end
 
       node
