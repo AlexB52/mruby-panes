@@ -24,8 +24,24 @@ module Panes
       h_sizing[:type]
     end
 
-    def available_width
-      Sizing.available_width(w_sizing) || parent&.available_width
+    def grown_width?
+      width_type == :grow
+    end
+
+    def fixed_width?
+      width_type == :fixed
+    end
+
+    def fit_width?
+      width_type == :fit
+    end
+
+    def fixed_height?
+      height_type == :fixed
+    end
+
+    def fit_height?
+      height_type == :fit
     end
   end
 
@@ -43,7 +59,14 @@ module Panes
       @parent = parent
       @x = @y = @height = @width = 0
       @w_sizing = Sizing.build(width)
+      if fixed_width?
+        @width = max_width
+      end
+
       @h_sizing = Sizing.build(height)
+      if fixed_height?
+        @height = max_height
+      end
       @padding = Padding[*padding]
       @child_gap = child_gap || 0
     end
@@ -54,6 +77,11 @@ module Panes
       @parent = node
       node.children << self
     end
+
+    def total_width_spacing
+      padding[:left] + padding[:right] + [0, (children.length-1) * child_gap].max
+    end
+
 
     def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, &block)
       node_parent = self
@@ -66,12 +94,10 @@ module Panes
       # Setup first width
       case node.width_type
       when :fit
-        node.width += node.padding[:left] +
-                      node.padding[:right] +
-                      [0, (node.children.length-1) * node.child_gap].max
+        node.width += node.total_width_spacing
       when :fixed
         node.width = node.max_width
-        node_parent.width += node.width
+        node_parent.width += node.width if node_parent.fit_width?
       end
 
       # Setup height - TODO change this to another place later
@@ -80,15 +106,26 @@ module Panes
         node.height += node.padding[:top] + node.padding[:bottom]
       when :fixed
         node.height = node.max_height
-        node_parent.height = [node_parent.height, node.height].max
+        node_parent.height = [node_parent.height, node.height].max if node_parent.fit_width?
       end
     end
 
     def inspect
-      to_h
+      {
+        id: id,
+        child_gap: child_gap,
+        w_sizing: w_sizing,
+        h_sizing: h_sizing,
+        bounding_box: {
+          x:      x,
+          y:      y,
+          width:  width,
+          height: height
+        }
+      }
     end
 
-    def to_h
+    def to_command
       {
         id: id,
         type: :rectangle,
