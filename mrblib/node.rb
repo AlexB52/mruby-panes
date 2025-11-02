@@ -1,20 +1,40 @@
 module Panes
   class Node
-    attr_reader :id, :parent, :children
+    attr_accessor :id, :parent, :children, :w_sizing
     attr_accessor :x, :y, :width, :height
-    def initialize(id: nil, parent: nil, children: [], width: nil, height: nil)
+    attr_accessor :padding
+
+    def initialize(id: nil, parent: nil, children: [], width: nil, height: nil, padding: [0])
       @id = id
-      @parent = parent
       @children = children
+      @parent = parent
       @x = @y = 0
-      @width = width || 0
+      @w_sizing = Sizing.build(width)
       @height = height || 0
+      @padding = Padding[*padding]
+    end
+
+    def max_width
+      w_sizing[:max]
+    end
+
+    def width_type
+      w_sizing[:type]
+    end
+
+    def available_width
+      Sizing.available_width(w_sizing) || parent&.available_width
+    end
+
+    def parent=(node)
+      return unless node
+
+      @parent = node
+      node.children << self
     end
 
     def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, &block)
-      padding_values = Padding[*padding]
-
-      self.children << node = Node.new(id: id, parent: self)
+      @children << node = Node.new(id: id, parent: self, width: width, padding: padding)
 
       if block
         node.instance_eval(&block)
@@ -26,21 +46,29 @@ module Panes
       last_index = node.children.length - 1
 
       node.children.each_with_index do |child, index|
-        child.x = padding_values[:left] + content_width
-        child.y = padding_values[:top]
+        child.x = node.padding[:left] + content_width
+        child.y = node.padding[:top]
         content_width += child.width
         content_width += gap if index < last_index
         tallest_child = [tallest_child, child.height].max
       end
 
-      node.width = [
-        width || 0,
-        padding_values[:left] + content_width + padding_values[:right]
-      ].max
+      node.width = case node.width_type
+        when :fixed
+          node.max_width
+        when :grow
+          # 0
+        when :fit
+          node.padding[:left] + content_width + node.padding[:right]
+        when :percent
+          raise NotImplementedError, 'percent isn\'t supported'
+        else
+          raise 'not supposed to be there'
+        end
 
       node.height = [
         height || 0,
-        padding_values[:top] + tallest_child + padding_values[:bottom]
+        node.padding[:top] + tallest_child + node.padding[:bottom]
       ].max
 
       node
