@@ -13,23 +13,32 @@ module Panes
     def ui(**config, &block)
       @tree.ui(**config, &block)
 
+      set_positions(@tree)
+
       @tree.children.flat_map do |node|
         build_commands(node)
       end
     end
     alias :build :ui
 
-    def build_commands(node, offset_x: 0, offset_y: 0)
-      command = node.to_h
-      command[:bounding_box][:x] += offset_x
-      command[:bounding_box][:y] += offset_y
+    def set_positions(node, offset_x = 0, offset_y = 0)
+      node.x = offset_x
+      node.y = offset_y
 
-      [command] + node.children.flat_map do |child|
-        build_commands(
+      node.children.each do |child|
+        set_positions(
           child,
-          offset_x: command[:bounding_box][:x],
-          offset_y: command[:bounding_box][:y]
+          offset_x + node.padding[:left],
+          offset_y + node.padding[:top]
         )
+
+        offset_x += child.width + node.child_gap
+      end
+    end
+
+    def build_commands(node)
+      [node.to_h] + node.children.flat_map do |child|
+        build_commands(child)
       end
     end
   end
