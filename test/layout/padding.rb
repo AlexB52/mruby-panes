@@ -4,7 +4,7 @@ class TestRootWindow < MTest::Unit::TestCase
 
     commands = layout.build(width: 20, height: 20)
 
-    assert_equal([
+    assert_commands([
       {
         id: nil,
         type: :rectangle,
@@ -21,7 +21,7 @@ class TestRootWindow < MTest::Unit::TestCase
       ui(width: 30, height: 30)
     end
 
-    assert_equal([
+    assert_commands([
       {
         id: nil,
         type: :rectangle,
@@ -48,7 +48,7 @@ class TestRootWindow < MTest::Unit::TestCase
       ui(id: 'two', width: 30, height: 30)
     end
 
-    assert_equal([
+    assert_commands([
       {
         id: 'root',
         type: :rectangle,
@@ -79,7 +79,7 @@ class TestRootWindow < MTest::Unit::TestCase
       end
     end
 
-    assert_equal([
+    assert_commands([
       {
         id: 'root',
         type: :rectangle,

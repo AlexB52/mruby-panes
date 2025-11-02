@@ -10,6 +10,8 @@ task :mtest do
   Tempfile.open("test_file") do |test_file|
     content = ""
 
+    content += File.read("test/support.rb")
+
     mruby_files.each do |file|
       content += File.read(file) + "\n"
     end

@@ -7,7 +7,7 @@ class TestPaddings < MTest::Unit::TestCase
       ui(id: 'two', width: 30, height: 30)
     end
 
-    assert_equal([
+    assert_commands([
       {
         id: 'root',
         type: :rectangle,
@@ -38,7 +38,7 @@ class TestPaddings < MTest::Unit::TestCase
       end
     end
 
-    assert_equal([
+    assert_commands([
       {
         id: 'root',
         type: :rectangle,
@@ -79,7 +79,7 @@ class TestPaddings < MTest::Unit::TestCase
       end
     end
 
-    assert_equal([
+    assert_commands([
       {
         id: 'root',
         type: :rectangle,
