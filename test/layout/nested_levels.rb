@@ -1,8 +1,49 @@
-class TestPaddings < MTest::Unit::TestCase
-  def test_padding_with_one_level
+class TestRootWindow < MTest::Unit::TestCase
+  def test_fixed_dimensions
     layout = Panes.init(width: 60, height: 60)
 
-    commands = layout.build(id: 'root', padding: [1]) do
+    commands = layout.build(width: 20, height: 20)
+
+    assert_commands([
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 20, height: 20 },
+      }
+    ], commands)
+  end
+
+  def test_fixed_dimensions_with_nested_elements
+    layout = Panes.init(width: 60, height: 60)
+
+    commands = layout.build(width: 60, height: 60) do
+      ui(width: 20, height: 20)
+      ui(width: 30, height: 30)
+    end
+
+    assert_commands([
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 60, height: 60 },
+      },
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 20, height: 20 },
+      },
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 20, y: 0, width: 30, height: 30 },
+      }
+    ], commands)
+  end
+
+  def test_with_nested_elements_with_fit_width
+    layout = Panes.init(width: 60, height: 60)
+
+    commands = layout.build(id: 'root') do
       ui(id: 'one', width: 20, height: 20)
       ui(id: 'two', width: 30, height: 30)
     end
@@ -11,29 +52,29 @@ class TestPaddings < MTest::Unit::TestCase
       {
         id: 'root',
         type: :rectangle,
-        bounding_box: { x: 0, y: 0, width: 52, height: 32 },
+        bounding_box: { x: 0, y: 0, width: 50, height: 30 },
       },
       {
         id: 'one',
         type: :rectangle,
-        bounding_box: { x: 1, y: 1, width: 20, height: 20 },
+        bounding_box: { x: 0, y: 0, width: 20, height: 20 },
       },
       {
         id: 'two',
         type: :rectangle,
-        bounding_box: { x: 21, y: 1, width: 30, height: 30 },
+        bounding_box: { x: 20, y: 0, width: 30, height: 30 },
       }
     ], commands)
   end
 
-  def test_paddings_with_nested_levels
+  def test_with_multiple_nested_levels
     layout = Panes.init(width: 60, height: 60)
 
-    commands = layout.build(id: 'root', padding: [1]) do
-      ui(id: 'one', width: 20, height: 20, padding: [2]) do
-        ui(id: 'three', width: 10, height: 10)
+    commands = layout.build(id: 'root') do
+      ui(id: 'one', width: 20, height: 20) do
+        ui(id: 'three', width: 10, height: 20)
       end
-      ui(id: 'two', width: 30, height: 30, padding: [3]) do
+      ui(id: 'two', width: 30, height: 30) do
         ui(id: 'four', width: 10, height: 20)
       end
     end
@@ -42,68 +83,27 @@ class TestPaddings < MTest::Unit::TestCase
       {
         id: 'root',
         type: :rectangle,
-        bounding_box: { x: 0, y: 0, width: 52, height: 32 },
+        bounding_box: { x: 0, y: 0, width: 50, height: 30 },
       },
       {
         id: 'one',
         type: :rectangle,
-        bounding_box: { x: 1, y: 1, width: 20, height: 20 },
+        bounding_box: { x: 0, y: 0, width: 20, height: 20 },
       },
       {
         id: 'three',
         type: :rectangle,
-        bounding_box: { x: 3, y: 3, width: 10, height: 10 },
+        bounding_box: { x: 0, y: 0, width: 10, height: 20 },
       },
       {
         id: 'two',
         type: :rectangle,
-        bounding_box: { x: 21, y: 1, width: 30, height: 30 },
+        bounding_box: { x: 20, y: 0, width: 30, height: 30 },
       },
       {
         id: 'four',
         type: :rectangle,
-        bounding_box: { x: 24, y: 4, width: 10, height: 20 },
-      }
-    ], commands)
-  end
-
-  def test_child_gap
-    layout = Panes.init(width: 60, height: 60)
-
-    commands = layout.build(id: 'root', padding: [1], child_gap: 5) do
-      ui(id: 'one', width: 20, height: 20, padding: [2]) do
-        ui(id: 'three', width: 10, height: 10)
-      end
-      ui(id: 'two', width: 30, height: 30, padding: [3]) do
-        ui(id: 'four', width: 10, height: 20)
-      end
-    end
-
-    assert_commands([
-      {
-        id: 'root',
-        type: :rectangle,
-        bounding_box: { x: 0, y: 0, width: 57, height: 32 },
-      },
-      {
-        id: 'one',
-        type: :rectangle,
-        bounding_box: { x: 1, y: 1, width: 20, height: 20 },
-      },
-      {
-        id: 'three',
-        type: :rectangle,
-        bounding_box: { x: 3, y: 3, width: 10, height: 10 },
-      },
-      {
-        id: 'two',
-        type: :rectangle,
-        bounding_box: { x: 26, y: 1, width: 30, height: 30 },
-      },
-      {
-        id: 'four',
-        type: :rectangle,
-        bounding_box: { x: 29, y: 4, width: 10, height: 20 },
+        bounding_box: { x: 20, y: 0, width: 10, height: 20 },
       }
     ], commands)
   end
