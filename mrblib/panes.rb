@@ -13,7 +13,8 @@ module Panes
     def ui(**config, &block)
       @tree.ui(**config, &block)
 
-      grow_containers(@tree)
+      grow_width_containers(@tree)
+      grow_height_containers(@tree)
       set_positions(@tree)
 
       @tree.children.flat_map do |node|
@@ -22,9 +23,8 @@ module Panes
     end
     alias :build :ui
 
-    def grow_containers(node)
+    def grow_width_containers(node)
       growables, sized = node.children.partition(&:grown_width?)
-
       if growables.any?
         extra_width = [node.width - node.total_width_spacing - sized.sum(&:width), 0].max
         current_sizes = growables.map(&:width)
@@ -36,7 +36,21 @@ module Panes
       end
 
       node.children.each do |child|
-        grow_containers(child)
+        grow_width_containers(child)
+      end
+    end
+
+    def grow_height_containers(node)
+      growables, sized = node.children.partition(&:grown_height?)
+      if growables.any?
+        max_height = [node.height - node.total_height_spacing, 0].max
+        growables.each do |child|
+          child.height = max_height
+        end
+      end
+
+      node.children.each do |child|
+        grow_height_containers(child)
       end
     end
 
