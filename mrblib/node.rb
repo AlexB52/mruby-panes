@@ -43,6 +43,10 @@ module Panes
     def fit_height?
       height_type == :fit
     end
+
+    def grown_height?
+      height_type == :grow
+    end
   end
 
   class Node
@@ -82,6 +86,9 @@ module Panes
       padding[:left] + padding[:right] + [0, (children.length-1) * child_gap].max
     end
 
+    def total_height_spacing
+      padding[:top] + padding[:bottom]
+    end
 
     def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, &block)
       node_parent = self

@@ -88,93 +88,157 @@ class TestWidthGrow < MTest::Unit::TestCase
   end
 end
 
-# class TestHeightGrow < MTest::Unit::TestCase
-#   def test_grow_heights_one_level
-#     skip
-#     layout = Panes.init(width: 60, height: 60)
+class TestHeightGrow < MTest::Unit::TestCase
+  def test_root_level
+    layout = Panes.init(width: 60, height: 60)
 
-#     commands = layout.build(width: 60, height: 60) do
-#       ui(width: 20, height: Panes::Sizing.grow)
-#       ui(width: 30, height: Panes::Sizing.grow)
-#     end
+    commands = layout.build(width: 30, height: Panes::Sizing.grow)
 
-#     assert_commands([
-#       {
-#         id: nil,
-#         type: :rectangle,
-#         bounding_box: { x: 0, y: 0, width: 60, height: 60 },
-#       },
-#       {
-#         id: nil,
-#         type: :rectangle,
-#         bounding_box: { x: 0, y: 0, width: 20, height: 60 },
-#       },
-#       {
-#         id: nil,
-#         type: :rectangle,
-#         bounding_box: { x: 20, y: 0, width: 30, height: 60 },
-#       }
-#     ], commands)
-#   end
-# end
+    assert_commands([
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 30, height: 60 },
+      }
+    ], commands)
+  end
 
-# class TestMixedGrow < MTest::Unit::TestCase
-#   def test_one_level_with_max_size
-#     skip
-#     layout = Panes.init(width: 60, height: 60)
+  def test_grow_heights_one_level
+    layout = Panes.init(width: 60, height: 60)
 
-#     commands = layout.build(width: Panes::Sizing.grow, height: Panes::Sizing.grow(0, 50))
+    commands = layout.build(width: 60, height: 60) do
+      ui(width: 20, height: Panes::Sizing.grow)
+      ui(width: 30, height: Panes::Sizing.grow)
+    end
 
-#     assert_commands([
-#       {
-#         id: nil,
-#         type: :rectangle,
-#         bounding_box: { x: 0, y: 0, width: 60, height: 50 },
-#       }
-#     ], commands)
-#   end
+    assert_commands([
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 60, height: 60 },
+      },
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 20, height: 60 },
+      },
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 20, y: 0, width: 30, height: 60 },
+      }
+    ], commands)
+  end
 
-#   def test_with_multiple_nested_levels_width
-#     skip
-#     layout = Panes.init(width: 60, height: 60)
+  def test_grow_nested_levels_with_paddings_and_child_gaps
+    layout = Panes.init(width: 200, height: 200)
 
-#     commands = layout.build(id: 'root') do
-#       ui(id: 'one', width: Panes::Sizing.grow, height: 20) do
-#         ui(id: 'three', width: Panes::Sizing.grow, height: Panes::Sizing.grow)
-#       end
-#       ui(id: 'two', width: Panes::Sizing.grow, height: 30) do
-#         ui(id: 'four', width: Panes::Sizing.grow, height: Panes::Sizing.grow)
-#       end
-#     end
+    commands = layout.build(id: 'root', width: 60, height: Panes::Sizing.grow) do
+      ui(id: 'one', width: 100, height: 150, padding: [5], child_gap: 5) do
+        ui(id: 'two',   width: 30, height: 20)
+        ui(id: 'three', width: 20, height: Panes::Sizing.grow)
+        ui(id: 'four',  width: 20, height: Panes::Sizing.grow)
+      end
 
-#     assert_commands([
-#       {
-#         id: 'root',
-#         type: :rectangle,
-#         bounding_box: { x: 0, y: 0, width: 60, height: 30 },
-#       },
-#       {
-#         id: 'one',
-#         type: :rectangle,
-#         bounding_box: { x: 0, y: 0, width: 30, height: 20 },
-#       },
-#       {
-#         id: 'three',
-#         type: :rectangle,
-#         bounding_box: { x: 0, y: 0, width: 30, height: 20 },
-#       },
-#       {
-#         id: 'two',
-#         type: :rectangle,
-#         bounding_box: { x: 30, y: 0, width: 30, height: 30 },
-#       },
-#       {
-#         id: 'four',
-#         type: :rectangle,
-#         bounding_box: { x: 30, y: 0, width: 30, height: 30 },
-#       }
-#     ], commands)
-#   end
-# end
+      ui(id: 'five', width: 30, height: Panes::Sizing.grow)
+    end
+
+    assert_commands([
+      {
+        id: 'root',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 60, height: 200 },
+      },
+      {
+        id: 'one',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 100, height: 150 },
+      },
+      {
+        id: 'two',
+        type: :rectangle,
+        bounding_box: { x: 5, y: 5, width: 30, height: 20 },
+      },
+      {
+        id: 'three',
+        type: :rectangle,
+        bounding_box: { x: 40, y: 5, width: 20, height: 140 },
+      },
+      {
+        id: 'four',
+        type: :rectangle,
+        bounding_box: { x: 65, y: 5, width: 20, height: 140 },
+      },
+      {
+        id: 'five',
+        type: :rectangle,
+        bounding_box: { x: 100, y: 0, width: 30, height: 200 },
+      }
+    ], commands)
+  end
+end
+
+class TestMixedGrow < MTest::Unit::TestCase
+  def test_one_level_with_max_size
+    layout = Panes.init(width: 60, height: 60)
+
+    commands = layout.build(width: Panes::Sizing.grow, height: Panes::Sizing.grow)
+
+    assert_commands([
+      {
+        id: nil,
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 60, height: 60 },
+      }
+    ], commands)
+  end
+
+  def test_with_multiple_nested_levels_width
+    layout = Panes.init(width: 100, height: 60)
+
+    commands = layout.build(id: 'root', padding: [5], child_gap: 5, width: Panes::Sizing.grow, height: Panes::Sizing.grow) do
+      ui(id: 'one', width: Panes::Sizing.grow, height: 20) do
+        ui(id: 'two', width: Panes::Sizing.grow, height: Panes::Sizing.grow)
+      end
+      ui(id: 'three', width: Panes::Sizing.grow, height: 30) do
+        ui(id: 'four', width: Panes::Sizing.grow, height: Panes::Sizing.grow)
+        ui(id: 'five', width: Panes::Sizing.grow, height: Panes::Sizing.grow)
+      end
+    end
+
+    assert_commands([
+      {
+        id: 'root',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 100, height: 60 },
+      },
+      {
+        id: 'one',
+        type: :rectangle,
+        bounding_box: { x: 5, y: 5, width: 42.5, height: 20 },
+      },
+      {
+        id: 'two',
+        type: :rectangle,
+        bounding_box: { x: 5, y: 5, width: 42.5, height: 20 },
+      },
+      {
+        id: 'three',
+        type: :rectangle,
+        bounding_box: { x: 52.5, y: 5, width: 42.5, height: 30 },
+      },
+      {
+        id: 'four',
+        type: :rectangle,
+        bounding_box: { x: 52.5, y: 5, width: 21.25, height: 30 },
+      },
+      {
+        id: 'five',
+        type: :rectangle,
+        bounding_box: { x: 73.75, y: 5, width: 21.25, height: 30 },
+      }
+    ], commands)
+  end
+end
 
 MTest::Unit.new.run
