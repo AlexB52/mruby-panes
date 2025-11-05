@@ -1,34 +1,81 @@
 module Panes
   module Calculations
-    def self.water_fill_distribution(current_sizes, extra)
-      n       = current_sizes.length
-      result  = current_sizes.dup
-      order   = (0...n).sort_by { |i| current_sizes[i] }
-      extra   = extra.to_f
+    Level = Struct.new(:idx, :current, :min, :max) do
+      def fillable?
+        return true unless max
+
+        current < max
+      end
+    end
+
+    def self.water_fill_distribution(levels, extra)
+      extra  = extra.to_f
+      n      = levels.length
+      result = levels.map.with_index do |level, idx|
+        case level
+        when Integer, Float
+          Level.new(idx, level, 0, nil)
+        when Hash
+          Level.new(idx, level[:current], level[:min], level[:max])
+        end
+      end
+
+      order = result.sort_by(&:current)
+
+      # spent = nil
+      # until spent == 0
+      #   spent = 0
+      #   level = result.max
+      # end
 
       i = 0
-      while i < n - 1 && extra > 0
-        level      = current_sizes[order[i]]
-        next_level = current_sizes[order[i + 1]]
-        need       = (next_level - level) * (i + 1)
 
-        if extra < need
-          inc = extra / (i + 1)
-          order[0..i].each { |idx| result[idx] += inc }
-          extra = 0
+      while i < n - 1 && extra > 0
+        value      = order[i].current
+        next_value = order[i + 1].current
+
+        if extra >= next_value - value
+          order[0..i].each do |level|
+            next unless level.fillable?
+
+            old_value = level.current
+            if level.max && level.max < next_value
+              level.current = level.max
+            else
+              level.current = next_value
+            end
+            extra -= (level.current - old_value)
+          end
+
+          i += 1
         else
-          order[0..i].each { |idx| result[idx] = next_level }
-          extra -= need
+          inc = extra / (i + 1)
+          order[0..i].each do |level|
+            next unless level.fillable?
+
+            old_value = level.current
+            next_value = old_value + inc
+
+            if level.max && level.max < next_value
+              level.current = level.max
+            else
+              level.current = next_value
+            end
+            extra -= (level.current - old_value)
+          end
+
           i += 1
         end
+
+        order.sort_by!(&:current)
       end
 
       if extra > 0
         inc = extra / n
-        (0...n).each { |j| result[j] += inc }
+        (0...n).each { |j| result[j].current += inc }
       end
 
-      result
+      result.sort_by(&:idx).map(&:current)
     end
   end
 end
