@@ -1,81 +1,64 @@
 module Panes
   module Calculations
-    Level = Struct.new(:idx, :current, :min, :max) do
-      def fillable?
-        return true unless max
-
-        current < max
-      end
-    end
-
     def self.water_fill_distribution(levels, extra)
-      extra  = extra.to_f
-      n      = levels.length
-      result = levels.map.with_index do |level, idx|
-        case level
-        when Integer, Float
-          Level.new(idx, level, 0, nil)
+      # normalize
+      items = levels.map.with_index do |lv, idx|
+        case lv
+        when Numeric
+          { idx: idx, cur: lv.to_f, min: 0, max: Float::INFINITY }
         when Hash
-          Level.new(idx, level[:current], level[:min], level[:max])
-        end
-      end
-
-      order = result.sort_by(&:current)
-
-      # spent = nil
-      # until spent == 0
-      #   spent = 0
-      #   level = result.max
-      # end
-
-      i = 0
-
-      while i < n - 1 && extra > 0
-        value      = order[i].current
-        next_value = order[i + 1].current
-
-        if extra >= next_value - value
-          order[0..i].each do |level|
-            next unless level.fillable?
-
-            old_value = level.current
-            if level.max && level.max < next_value
-              level.current = level.max
-            else
-              level.current = next_value
-            end
-            extra -= (level.current - old_value)
-          end
-
-          i += 1
+          {
+            idx: idx,
+            cur: (lv[:current] || 0).to_f,
+            min: (lv[:min] || 0).to_f,
+            max: (lv[:max] ||  Float::INFINITY).to_f
+          }
         else
-          inc = extra / (i + 1)
-          order[0..i].each do |level|
-            next unless level.fillable?
+          raise ArgumentError, "unsupported item: #{lv.inspect}"
+        end
+      end
 
-            old_value = level.current
-            next_value = old_value + inc
+      # sort by current level
+      order = items.sort_by { |it| it[:cur] }
+      extra = extra.to_f
+      i = 0
+      eps = 1e-9 # epsilon to avoid float ping-pong
 
-            if level.max && level.max < next_value
-              level.current = level.max
-            else
-              level.current = next_value
-            end
-            extra -= (level.current - old_value)
-          end
-
+      while extra > eps && i < order.length
+        group = order.take(i + 1).reject { |it| it[:cur] >= it[:max] }
+        if group.empty?
           i += 1
+          next
         end
 
-        order.sort_by!(&:current)
+        group_cur  = group.first[:cur]
+        neighbor   = order[i + 1]&.dig(:cur) || Float::INFINITY
+        cap_level  = group.map { |it| it[:max] }.min
+
+        target     = [neighbor, cap_level].min
+        delta      = target - group_cur
+        need       = delta * group.length
+
+        if delta <= eps
+          i += 1
+          next
+        end
+
+        if extra + eps >= need
+          group.each { |it| it[:cur] += delta }
+          extra -= need
+
+          i += 1 if target == neighbor
+        else
+          delta = extra / group.length
+          group.each { |it| it[:cur] += delta }
+          extra = 0.0
+        end
       end
 
-      if extra > 0
-        inc = extra / n
-        (0...n).each { |j| result[j].current += inc }
-      end
-
-      result.sort_by(&:idx).map(&:current)
+      # return in original order
+      items.sort_by { |it| it[:idx] }.map { |it| it[:cur] }
     end
+
   end
 end
