@@ -1,6 +1,5 @@
 class TestWidthGrow < MTest::Unit::TestCase
   def test_root_level_max_width_inferior_to_width_available
-    skip
     layout = Panes.init(width: 60, height: 60)
 
     commands = layout.build(id: 'root', width: Panes::Sizing.grow(max: 50), height: 30)
