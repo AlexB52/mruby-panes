@@ -32,7 +32,7 @@ module Panes
       end
     end
 
-    def self.fit(min = 0, max = nil)
+    def self.fit(min: 0, max: nil)
       result = { type: TYPE_FIT, min: min }
       if max
         result.merge!(max: max)
@@ -40,7 +40,7 @@ module Panes
       result
     end
 
-    def self.grow(min = 0, max = nil)
+    def self.grow(min: 0, max: nil)
       result = { type: TYPE_GROW, min: min }
       if max
         result.merge!(max: max)
