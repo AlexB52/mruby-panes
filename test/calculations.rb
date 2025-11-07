@@ -48,6 +48,14 @@ module Panes
         { current: 10, min: 0, max: 50 },
       ], 100)
     end
+
+    def test_when_items_with_min
+      assert_equal [50, 125, 75], Calculations.water_fill_distribution([
+        { current: 0, min: 0, max: 50 },
+        { current: 0, min: 125, max: nil },
+        { current: 0, min: 0, max: nil },
+      ], 250)
+    end
   end
 end
 

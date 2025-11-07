@@ -2,19 +2,29 @@ module Panes
   module Calculations
     def self.water_fill_distribution(levels, extra)
       # normalize
+      min_amount = 0
       items = levels.map.with_index do |lv, idx|
         case lv
         when Numeric
+          min_amount += 0
           { idx: idx, cur: lv.to_f, min: 0, max: Float::INFINITY }
         when Hash
-          {
-            idx: idx,
-            cur: (lv[:current] || 0).to_f,
-            min: (lv[:min] || 0).to_f,
-            max: (lv[:max] ||  Float::INFINITY).to_f
-          }
+          cur = (lv[:current] || 0).to_f
+          min = (lv[:min] || 0).to_f
+          max = (lv[:max] ||  Float::INFINITY).to_f
+
+          min_amount += [0, min - cur].max
+          { idx: idx, cur: cur, min: min, max: max }
         else
           raise ArgumentError, "unsupported item: #{lv.inspect}"
+        end
+      end
+
+      if min_amount < extra
+        items.each do |item|
+          need = [0, item[:min] - item[:cur]].max
+          extra -= need
+          item[:cur] += need
         end
       end
 
