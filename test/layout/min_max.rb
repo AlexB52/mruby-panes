@@ -78,6 +78,33 @@ class TestWidthGrow < MTest::Unit::TestCase
       },
     ], commands)
   end
+
+  def test_root_nested_levels_with_padding_and_child_gap
+    layout = Panes.init(width: 200, height: 200)
+
+    commands = layout.build(id: 'root', width: Panes::Sizing.grow, height: 30, padding: [5], child_gap: 5) do
+      ui(id: 'one',   width: Panes::Sizing.grow(max: 50),  height: 20)
+      ui(id: 'two',   width: Panes::Sizing.grow(min: 125), height: 20)
+    end
+
+    assert_commands([
+      {
+        id: 'root',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 200, height: 30 },
+      },
+      {
+        id: 'one',
+        type: :rectangle,
+        bounding_box: { x: 5, y: 5, width: 50, height: 20 },
+      },
+      {
+        id: 'two',
+        type: :rectangle,
+        bounding_box: { x: 60, y: 5, width: 135, height: 20 },
+      },
+    ], commands)
+  end
 end
 
 MTest::Unit.new.run
