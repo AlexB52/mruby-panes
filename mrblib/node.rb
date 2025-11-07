@@ -109,12 +109,12 @@ module Panes
       end
 
       # Setup height - TODO change this to another place later
-      case node.height_type
-      when :fit
-        node.height += node.padding[:top] + node.padding[:bottom]
-      when :fixed
-        node.height = node.min_height
-        node_parent.height = [node_parent.height, node.height].max if node_parent.fit_width?
+      if node.fit_height?
+        node.height += node.total_height_spacing
+      end
+
+      if node_parent.fit_height?
+        node_parent.height = [node_parent.height, node.min_height].max
       end
     end
 
