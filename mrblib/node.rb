@@ -1,6 +1,6 @@
 module Panes
   class Node
-    include Panes::SizingHelpers
+    include SizingHelpers
 
     attr_accessor :id, :parent, :children
     attr_accessor :w_sizing, :h_sizing, :child_gap
