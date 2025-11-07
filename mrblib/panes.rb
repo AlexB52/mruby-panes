@@ -26,7 +26,7 @@ module Panes
     def grow_width_containers(node)
       growables, sized = node.children.partition(&:grown_width?)
       if growables.any?
-        extra_width = [node.width - node.total_width_spacing - sized.sum(&:width), 0].max
+        extra_width = [0, node.width - node.total_width_spacing - sized.sum(&:width)].max
         current_sizes = growables.map do |node|
           {
             current: node.width,
@@ -35,7 +35,8 @@ module Panes
           }
         end
 
-        Calculations.water_fill_distribution(current_sizes, extra_width)
+        Calculations
+          .water_fill_distribution(current_sizes, extra_width)
           .each.with_index do |extra, i|
             growables[i].width += extra
           end

@@ -20,10 +20,6 @@ module Panes
     # Clamps the axis size to an exact size in pixels.
     TYPE_FIXED = :fixed
 
-    def self.available_width(config)
-      config[:max]
-    end
-
     def self.build(value = nil)
       case value
       when Hash          then value
@@ -32,20 +28,12 @@ module Panes
       end
     end
 
-    def self.fit(min: 0, max: nil)
-      result = { type: TYPE_FIT, min: min }
-      if max
-        result.merge!(max: max)
-      end
-      result
+    def self.fit(min: 0, max: Float::INFINITY)
+      { type: TYPE_FIT, min: min, max: max }
     end
 
-    def self.grow(min: 0, max: nil)
-      result = { type: TYPE_GROW, min: min }
-      if max
-        result.merge!(max: max)
-      end
-      result
+    def self.grow(min: 0, max: Float::INFINITY)
+      { type: TYPE_GROW, min: min, max: max }
     end
 
     def self.fixed(width)
