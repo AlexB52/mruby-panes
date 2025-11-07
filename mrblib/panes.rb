@@ -52,7 +52,7 @@ module Panes
       if growables.any?
         max_height = [node.height - node.total_height_spacing, 0].max
         growables.each do |child|
-          child.height = max_height
+          child.height = [max_height, child.max_height].min
         end
       end
 
