@@ -1,34 +1,74 @@
 module Panes
   module Calculations
-    def self.water_fill_distribution(current_sizes, extra)
-      n       = current_sizes.length
-      result  = current_sizes.dup
-      order   = (0...n).sort_by { |i| current_sizes[i] }
-      extra   = extra.to_f
+    def self.water_fill_distribution(levels, extra)
+      # normalize
+      min_amount = 0
+      items = levels.map.with_index do |lv, idx|
+        case lv
+        when Numeric
+          min_amount += 0
+          { idx: idx, cur: lv.to_f, min: 0, max: Float::INFINITY }
+        when Hash
+          cur = (lv[:current] || 0).to_f
+          min = (lv[:min] || 0).to_f
+          max = (lv[:max] ||  Float::INFINITY).to_f
 
-      i = 0
-      while i < n - 1 && extra > 0
-        level      = current_sizes[order[i]]
-        next_level = current_sizes[order[i + 1]]
-        need       = (next_level - level) * (i + 1)
-
-        if extra < need
-          inc = extra / (i + 1)
-          order[0..i].each { |idx| result[idx] += inc }
-          extra = 0
+          min_amount += [0, min - cur].max
+          { idx: idx, cur: cur, min: min, max: max }
         else
-          order[0..i].each { |idx| result[idx] = next_level }
-          extra -= need
-          i += 1
+          raise ArgumentError, "unsupported item: #{lv.inspect}"
         end
       end
 
-      if extra > 0
-        inc = extra / n
-        (0...n).each { |j| result[j] += inc }
+      if min_amount < extra
+        items.each do |item|
+          need = [0, item[:min] - item[:cur]].max
+          extra -= need
+          item[:cur] += need
+        end
       end
 
-      result
+      # sort by current level
+      order = items.sort_by { |it| it[:cur] }
+      extra = extra.to_f
+      i = 0
+      eps = 1e-9 # epsilon to avoid float ping-pong
+
+      while extra > eps && i < order.length
+        group = order.take(i + 1).reject { |it| it[:cur] >= it[:max] }
+        if group.empty?
+          i += 1
+          next
+        end
+
+        group_cur  = group.first[:cur]
+        neighbor   = order[i + 1]&.dig(:cur) || Float::INFINITY
+        cap_level  = group.map { |it| it[:max] }.min
+
+        target     = [neighbor, cap_level].min
+        delta      = target - group_cur
+        need       = delta * group.length
+
+        if delta <= eps
+          i += 1
+          next
+        end
+
+        if extra + eps >= need
+          group.each { |it| it[:cur] += delta }
+          extra -= need
+
+          i += 1 if target == neighbor
+        else
+          delta = extra / group.length
+          group.each { |it| it[:cur] += delta }
+          extra = 0.0
+        end
+      end
+
+      # return in original order
+      items.sort_by { |it| it[:idx] }.map { |it| it[:cur] }
     end
+
   end
 end

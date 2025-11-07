@@ -5,7 +5,7 @@ module Panes
     end
 
     def min_width
-      w_sizing[:max]
+      w_sizing[:min]
     end
 
     def width_type
@@ -17,7 +17,7 @@ module Panes
     end
 
     def min_height
-      h_sizing[:max]
+      h_sizing[:min]
     end
 
     def height_type
@@ -62,17 +62,18 @@ module Panes
       @children = children
       @parent = parent
       @x = @y = @height = @width = 0
+      @padding = Padding[*padding]
+      @child_gap = child_gap || 0
+
       @w_sizing = Sizing.build(width)
       if fixed_width?
-        @width = max_width
+        @width = min_width
       end
 
       @h_sizing = Sizing.build(height)
       if fixed_height?
-        @height = max_height
+        @height = min_height
       end
-      @padding = Padding[*padding]
-      @child_gap = child_gap || 0
     end
 
     def parent=(node)
@@ -99,12 +100,12 @@ module Panes
       end
 
       # Setup first width
-      case node.width_type
-      when :fit
+      if node.fit_width?
         node.width += node.total_width_spacing
-      when :fixed
-        node.width = node.max_width
-        node_parent.width += node.width if node_parent.fit_width?
+      end
+
+      if node_parent.fit_width?
+        node_parent.width += node.min_width
       end
 
       # Setup height - TODO change this to another place later
@@ -112,7 +113,7 @@ module Panes
       when :fit
         node.height += node.padding[:top] + node.padding[:bottom]
       when :fixed
-        node.height = node.max_height
+        node.height = node.min_height
         node_parent.height = [node_parent.height, node.height].max if node_parent.fit_width?
       end
     end
