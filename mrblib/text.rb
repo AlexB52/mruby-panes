@@ -4,6 +4,11 @@ module Panes
       result = []
       lines = content.split("\n")
       lines.each do |line|
+        if line.empty?
+          result << ""
+          next
+        end
+
         buffer, *words = line.split
         words.each do |word|
           if buffer.length + 1 + word.length <= width
