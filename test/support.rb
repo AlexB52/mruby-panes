@@ -32,6 +32,11 @@ module MTest::Assertions
   #   return "Expected: #{mu_pp exp}\n  Actual: #{mu_pp act}"
   # end
 
+  def diff exp, act
+    # adding a breakline before the message
+    return "\nExpected: #{mu_pp exp}\n  Actual: #{mu_pp act}"
+  end
+
   def assert_commands exp, act, msg = nil
     return assert(exp == act, msg) if msg
 

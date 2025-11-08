@@ -70,5 +70,46 @@ module Panes
       items.sort_by { |it| it[:idx] }.map { |it| it[:cur] }
     end
 
+    def self.text_size(text)
+      lines = text.strip.split("\n")
+      if lines.empty?
+        lines = [""]
+      end
+
+      words = text.split
+
+      w_max = lines.map(&:length).max || 0
+      w_min = words.map(&:length).max || 0
+      h_min = lines.length
+
+      h_max = 0
+      lines.each do |line|
+        line_height = 1
+        buffer = 0
+
+        line.split.each do |word|
+          word_length = word.length
+          if buffer.zero?
+            buffer = word_length
+            next
+          end
+
+          new_buffer = buffer + 1 + word_length
+          if new_buffer <= w_min
+            buffer = new_buffer
+          else
+            line_height += 1
+            buffer = word_length
+          end
+        end
+
+        h_max += line_height
+      end
+
+      {
+        width:  { min: w_min, max: w_max },
+        height: { min: h_min, max: h_max },
+      }
+    end
   end
 end
