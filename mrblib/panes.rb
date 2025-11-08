@@ -14,6 +14,7 @@ module Panes
       @tree.ui(**config, &block)
 
       grow_width_containers(@tree)
+      wrap_text(@tree)
       grow_height_containers(@tree)
       set_positions(@tree)
 
@@ -47,13 +48,29 @@ module Panes
       end
     end
 
+    def wrap_text(node)
+      if node.text?
+        node.height = Text.wrap(node.content, width: node.width).count
+        return
+      end
+
+      node.children.each do |child|
+        wrap_text(child)
+      end
+    end
+
     def grow_height_containers(node)
-      growables, sized = node.children.partition(&:grown_height?)
+      growables, sized = node.children.reject(&:text?).partition(&:grown_height?)
       if growables.any?
         max_height = [node.height - node.total_height_spacing, 0].max
         growables.each do |child|
           child.height = [max_height, child.max_height].min
         end
+      end
+
+      parent = node.parent
+      if parent&.fit_height?
+        parent.height = [parent.height, node.height].max
       end
 
       node.children.each do |child|
@@ -77,7 +94,7 @@ module Panes
     end
 
     def build_commands(node)
-      [node.to_command] + node.children.flat_map do |child|
+      [node.to_command].flatten + node.children.flat_map do |child|
         build_commands(child)
       end
     end
