@@ -50,7 +50,8 @@ module Panes
 
     def wrap_text(node)
       if node.text?
-        node.height = Text.wrap(node.content, width: node.width).count
+        lines = Text.wrap(node.content, width: node.width)
+        node.height = lines.count
         return
       end
 
@@ -94,8 +95,13 @@ module Panes
     end
 
     def build_commands(node)
-      [node.to_command].flatten + node.children.flat_map do |child|
-        build_commands(child)
+      case node.type
+      when :rectangle
+        node.to_commands + node.children.flat_map do |child|
+          build_commands(child)
+        end
+      when :text, :inline_text
+        node.to_commands
       end
     end
   end

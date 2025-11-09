@@ -2,10 +2,14 @@ require 'rake'
 require 'tempfile'
 
 desc 'Run mruby-mtest'
-task :mtest do
+task :mtest, [:file] do |t, args|
   mruby_binary = File.expand_path("./mruby/bin/mruby", __dir__)
   mruby_files = FileList["mrblib/**/*.rb"]
+
   test_files = FileList["test/**/*.rb"]
+  if args[:file]
+    test_files = [args[:file]]
+  end
 
   Tempfile.open("test_file") do |test_file|
     content = ""

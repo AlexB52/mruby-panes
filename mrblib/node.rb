@@ -31,7 +31,11 @@ module Panes
     end
 
     def text?
-      type == :text
+      type == :text || type == :inline_text
+    end
+
+    def inline_text?
+      type == :inline_text
     end
 
     def parent=(node)
@@ -85,28 +89,35 @@ module Panes
       node
     end
 
-    def text(content = '', id: nil, wrap: true)
+    def text(content = '', id: nil, wrap: true, &block)
       node_parent = self
-      boundaries = Calculations.text_size(content)
-      unless wrap
-        boundaries[:width][:min] = content.length
-      end
-
       @children << node = Node.new(
         id: id,
         parent: self,
         type: :text,
         content: content,
         wrap: wrap,
-        width: Sizing.grow(**boundaries[:width]),
-        height: Sizing.grow(**boundaries[:height])
+        width: Sizing.grow,
+        height: Sizing.grow,
       )
 
-      # if block
-      #   node.instance_eval(&block)
-      # end
+      if block
+        node.type = :inline_text
+        node.instance_eval(&block)
+      end
 
-      # Fit Width Adjustment
+      boundaries = Calculations.text_size(node.content)
+      unless node.wrap
+        boundaries[:width][:min] = node.content.length
+      end
+      node.w_sizing = Sizing.grow(**boundaries[:width])
+      node.h_sizing = Sizing.grow(**boundaries[:height])
+
+      if node_parent.inline_text?
+        node_parent.content += node.content
+      end
+
+      # Fit Width Adjustment - (unused)
       if node.fit_width?
         node.width += node.total_width_spacing
       end
@@ -115,7 +126,7 @@ module Panes
         node_parent.width += node.min_width
       end
 
-      # Fit Height Adjustment
+      # Fit Height Adjustment - (unused)
       if node.fit_height?
         node.height += node.total_height_spacing
       end
@@ -132,6 +143,7 @@ module Panes
         id: id,
         child_gap: child_gap,
         type: type,
+        wrap: wrap,
         content: content,
         w_sizing: w_sizing,
         h_sizing: h_sizing,
@@ -153,30 +165,69 @@ module Panes
       }
     end
 
-    def to_command
+    def to_commands
       case type
       when :rectangle
-        {
-          id: id,
-          type: :rectangle,
-          bounding_box: bounding_box
-        }
-      when :text
-        if wrap
-          Text.wrap(content, width: width).map.with_index do |line, i|
-            {
-              id: id,
-              type: :text,
-              text: line,
-              bounding_box: { x: x, y: y + i, width: line.length, height: 1 }
-            }
+        [
+          {
+            id: id,
+            type: :rectangle,
+            bounding_box: bounding_box
+          }
+        ]
+      when :inline_text
+        result   = []
+        y_offset = y
+
+        child_enum = children.each
+        child      = child_enum.next&.content.to_s
+        child_pos  = 0
+
+        new_cmd = ->(x0, y0) do
+          { id: id, type: :text, text: "", bounding_box: { x: x0, y: y0, width: 0, height: 1 } }
+        end
+
+        Text.wrap(content, width: width).each do |line|
+          cmd = new_cmd.call(x, y_offset)
+
+          if line.empty?
+            result << cmd
+            y_offset += 1
+            next
           end
-        else
+
+          line_pos = 0
+          while line_pos < line.length
+            if child_pos >= child.length # get a new child
+              result << cmd
+
+              child     = child_enum.next&.content.to_s
+              child_pos = 0
+              cmd = new_cmd.call(cmd[:bounding_box][:x] + cmd[:bounding_box][:width], y_offset)
+            end
+
+            take = [line.length - line_pos, child.length - child_pos].min
+
+            segment = child.byteslice(child_pos, take)
+            cmd[:text] << segment
+            cmd[:bounding_box][:width] += take
+
+            line_pos  += take
+            child_pos += take + 1
+          end
+
+          result << cmd
+          y_offset += 1
+        end
+
+        result
+      when :text
+        Text.wrap(content, width: width).map.with_index do |line, i|
           {
             id: id,
             type: :text,
-            text: content,
-            bounding_box: bounding_box
+            text: line,
+            bounding_box: { x: x, y: y + i, width: line.length, height: 1 }
           }
         end
       end
