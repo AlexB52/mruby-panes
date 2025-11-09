@@ -184,7 +184,7 @@ module Panes
         lines.each do |line|
           command = {id: id, type: :text, text: '', bounding_box: {x: x, y: y_offset, width: 0, height: 1}}
           if line.empty?
-            results << command
+            result << command
             next
           end
 
