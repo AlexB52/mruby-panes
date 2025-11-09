@@ -186,8 +186,8 @@ module Panes
         Text.wrap(content, width: width).each do |line|
           command = new_command.call(x, y_offset)
           if line.empty?
-            result << command
             y_offset += 1
+            result << command
             next
           end
 
