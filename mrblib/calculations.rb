@@ -71,7 +71,7 @@ module Panes
     end
 
     def self.text_size(text)
-      lines = text.strip.split("\n")
+      lines = text.split("\n")
       if lines.empty?
         lines = [""]
       end

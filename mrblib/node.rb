@@ -3,7 +3,7 @@ module Panes
     include SizingHelpers
 
     attr_accessor :id, :parent, :children
-    attr_accessor :type, :content, :wrap
+    attr_accessor :type, :content, :wrap, :inline
     attr_accessor :w_sizing, :h_sizing, :child_gap
     attr_accessor :x, :y, :width, :height
     attr_accessor :padding
@@ -15,6 +15,7 @@ module Panes
       @content = content
       @wrap = wrap
       @type = type
+      @inline = false
       @x = @y = @height = @width = 0
       @padding = Padding[*padding]
       @child_gap = child_gap || 0
@@ -31,7 +32,11 @@ module Panes
     end
 
     def text?
-      type == :text
+      type == :text || type == :inline_text
+    end
+
+    def inline_text?
+      type == :inline_text
     end
 
     def parent=(node)
@@ -85,28 +90,35 @@ module Panes
       node
     end
 
-    def text(content = '', id: nil, wrap: true)
+    def text(content = '', id: nil, wrap: true, &block)
       node_parent = self
-      boundaries = Calculations.text_size(content)
-      unless wrap
-        boundaries[:width][:min] = content.length
-      end
-
       @children << node = Node.new(
         id: id,
         parent: self,
         type: :text,
         content: content,
         wrap: wrap,
-        width: Sizing.grow(**boundaries[:width]),
-        height: Sizing.grow(**boundaries[:height])
+        width: Sizing.grow,
+        height: Sizing.grow,
       )
 
-      # if block
-      #   node.instance_eval(&block)
-      # end
+      if block
+        node.type = :inline_text
+        node.instance_eval(&block)
+      end
 
-      # Fit Width Adjustment
+      boundaries = Calculations.text_size(node.content)
+      unless node.wrap
+        boundaries[:width][:min] = node.content.length
+      end
+      node.w_sizing = Sizing.grow(**boundaries[:width])
+      node.h_sizing = Sizing.grow(**boundaries[:height])
+
+      if node_parent.inline_text?
+        node_parent.content += node.content
+      end
+
+      # Fit Width Adjustment - (unused)
       if node.fit_width?
         node.width += node.total_width_spacing
       end
@@ -115,7 +127,7 @@ module Panes
         node_parent.width += node.min_width
       end
 
-      # Fit Height Adjustment
+      # Fit Height Adjustment - (unused)
       if node.fit_height?
         node.height += node.total_height_spacing
       end
@@ -132,6 +144,7 @@ module Panes
         id: id,
         child_gap: child_gap,
         type: type,
+        wrap: wrap,
         content: content,
         w_sizing: w_sizing,
         h_sizing: h_sizing,
@@ -161,22 +174,51 @@ module Panes
           type: :rectangle,
           bounding_box: bounding_box
         }
-      when :text
-        if wrap
-          Text.wrap(content, width: width).map.with_index do |line, i|
-            {
-              id: id,
-              type: :text,
-              text: line,
-              bounding_box: { x: x, y: y + i, width: line.length, height: 1 }
-            }
+      when :inline_text
+        result = []
+        x_offset = x
+        y_offset = y
+        child_index = 0
+        child_c_index = 0
+
+        lines = Text.wrap(content, width: width)
+        lines.each do |line|
+          command = {id: id, type: :text, text: '', bounding_box: {x: x, y: y_offset, width: 0, height: 1}}
+          if line.empty?
+            results << command
+            next
           end
-        else
+
+          line.each_char do |char|
+            child_char = children[child_index].content.chars[child_c_index]
+            if child_char.nil?
+              result << command
+
+              child_index += 1
+              child_c_index = 0
+              child_char = children[child_index].content.chars[child_c_index]
+              x_offset = command[:bounding_box][:x] + command[:bounding_box][:width]
+              command = {id: id, type: :text, text: '', bounding_box: {x: x_offset, y: y_offset, width: 0, height: 1}}
+            end
+
+            command[:text] << child_char
+            command[:bounding_box][:width] += 1
+            child_c_index += 1
+          end
+
+          y_offset += 1
+          child_c_index += 1
+          result << command
+        end
+
+        result
+      when :text
+        Text.wrap(content, width: width).map.with_index do |line, i|
           {
             id: id,
             type: :text,
-            text: content,
-            bounding_box: bounding_box
+            text: line,
+            bounding_box: { x: x, y: y + i, width: line.length, height: 1 }
           }
         end
       end
