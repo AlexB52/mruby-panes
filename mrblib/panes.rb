@@ -97,13 +97,11 @@ module Panes
     def build_commands(node)
       case node.type
       when :rectangle
-        [node.to_command].flatten + node.children.flat_map do |child|
+        node.to_commands + node.children.flat_map do |child|
           build_commands(child)
         end
-      when :text
-        node.to_command
-      when :inline_text
-        node.to_command
+      when :text, :inline_text
+        node.to_commands
       end
     end
   end

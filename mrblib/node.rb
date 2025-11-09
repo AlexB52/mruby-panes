@@ -165,14 +165,16 @@ module Panes
       }
     end
 
-    def to_command
+    def to_commands
       case type
       when :rectangle
-        {
-          id: id,
-          type: :rectangle,
-          bounding_box: bounding_box
-        }
+        [
+          {
+            id: id,
+            type: :rectangle,
+            bounding_box: bounding_box
+          }
+        ]
       when :inline_text
         result   = []
         y_offset = y
