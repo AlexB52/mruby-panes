@@ -3,7 +3,7 @@ module Panes
     include SizingHelpers
 
     attr_accessor :id, :parent, :children
-    attr_accessor :type, :content, :wrap, :inline
+    attr_accessor :type, :content, :wrap
     attr_accessor :w_sizing, :h_sizing, :child_gap
     attr_accessor :x, :y, :width, :height
     attr_accessor :padding
@@ -15,7 +15,6 @@ module Panes
       @content = content
       @wrap = wrap
       @type = type
-      @inline = false
       @x = @y = @height = @width = 0
       @padding = Padding[*padding]
       @child_gap = child_gap || 0
