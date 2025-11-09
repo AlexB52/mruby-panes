@@ -187,6 +187,7 @@ module Panes
           command = new_command.call(x, y_offset)
           if line.empty?
             result << command
+            y_offset += 1
             next
           end
 
