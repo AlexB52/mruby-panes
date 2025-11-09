@@ -178,35 +178,36 @@ module Panes
         x_offset = x
         y_offset = y
         child_index = 0
-        child_c_index = 0
+        child_char_index = 0
 
-        lines = Text.wrap(content, width: width)
-        lines.each do |line|
-          command = {id: id, type: :text, text: '', bounding_box: {x: x, y: y_offset, width: 0, height: 1}}
+        child_char  = -> { children[child_index].content.chars[child_char_index] }
+        new_command = ->(x, y) { {id: id, type: :text, text: '', bounding_box: {x: x, y: y, width: 0, height: 1}} }
+
+        Text.wrap(content, width: width).each do |line|
+          command = new_command.call(x, y_offset)
           if line.empty?
             result << command
             next
           end
 
           line.each_char do |char|
-            child_char = children[child_index].content.chars[child_c_index]
-            if child_char.nil?
+            c_char = child_char.call
+            if c_char.nil?
               result << command
 
               child_index += 1
-              child_c_index = 0
-              child_char = children[child_index].content.chars[child_c_index]
-              x_offset = command[:bounding_box][:x] + command[:bounding_box][:width]
-              command = {id: id, type: :text, text: '', bounding_box: {x: x_offset, y: y_offset, width: 0, height: 1}}
+              child_char_index = 0
+              c_char = child_char.call
+              command = new_command.call(command[:bounding_box][:x] + command[:bounding_box][:width], y_offset)
             end
 
-            command[:text] << child_char
+            command[:text] << c_char
             command[:bounding_box][:width] += 1
-            child_c_index += 1
+            child_char_index += 1
           end
 
           y_offset += 1
-          child_c_index += 1
+          child_char_index += 1
           result << command
         end
 
