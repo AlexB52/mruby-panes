@@ -174,41 +174,47 @@ module Panes
           bounding_box: bounding_box
         }
       when :inline_text
-        result = []
-        x_offset = x
+        result   = []
         y_offset = y
-        child_index = 0
-        child_content = children[child_index].content
-        new_command = ->(x, y) { {id: id, type: :text, text: '', bounding_box: {x: x, y: y, width: 0, height: 1}} }
+
+        child_enum = children.each
+        child      = child_enum.next&.content.to_s
+        child_pos  = 0
+
+        new_cmd = ->(x0, y0) do
+          { id: id, type: :text, text: "", bounding_box: { x: x0, y: y0, width: 0, height: 1 } }
+        end
+
         Text.wrap(content, width: width).each do |line|
+          cmd = new_cmd.call(x, y_offset)
 
-          line_content = line
-          command = new_command.call(x, y_offset)
-
-          if line_content.empty?
+          if line.empty?
+            result << cmd
             y_offset += 1
-            child_index += 1
-            result << command
             next
           end
 
-          while line_content.length > child_content.length
-            command[:text] = child_content
-            command[:bounding_box][:width] = child_content.length
-            result << command
+          line_pos = 0
+          while line_pos < line.length
+            if child_pos >= child.length # get a new child
+              result << cmd
 
-            x_offset = child_content.length
-            child_index += 1
-            line_content = line_content[child_content.length..]
-            child_content = children[child_index].content
-            command = new_command.call(x_offset, y_offset)
+              child     = child_enum.next&.content.to_s
+              child_pos = 0
+              cmd = new_cmd.call(cmd[:bounding_box][:x] + cmd[:bounding_box][:width], y_offset)
+            end
+
+            take = [line.length - line_pos, child.length - child_pos].min
+
+            segment = child.byteslice(child_pos, take)
+            cmd[:text] << segment
+            cmd[:bounding_box][:width] += take
+
+            line_pos  += take
+            child_pos += take + 1
           end
 
-          command[:text] = line_content
-          command[:bounding_box][:width] = line_content.length
-          result << command
-
-          child_content = child_content[(line_content.length+1)..]
+          result << cmd
           y_offset += 1
         end
 
