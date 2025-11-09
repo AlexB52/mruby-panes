@@ -180,7 +180,7 @@ module Panes
         child_index = 0
         child_char_index = 0
 
-        child_char  = -> { children[child_index].content.chars[child_char_index] }
+        child_char  = -> { children[child_index].content[child_char_index] }
         new_command = ->(x, y) { {id: id, type: :text, text: '', bounding_box: {x: x, y: y, width: 0, height: 1}} }
 
         Text.wrap(content, width: width).each do |line|
