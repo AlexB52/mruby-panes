@@ -4,11 +4,12 @@ module Panes
 
     attr_accessor :id, :parent, :children
     attr_accessor :type, :content, :wrap
+    attr_accessor :border
     attr_accessor :w_sizing, :h_sizing, :child_gap
     attr_accessor :x, :y, :width, :height
     attr_accessor :padding
 
-    def initialize(id: nil, parent: nil, children: [], width: nil, height: nil, padding: [0], child_gap: 0, type: :rectangle, content: '', wrap: true)
+    def initialize(id: nil, parent: nil, children: [], width: nil, height: nil, padding: [0], child_gap: 0, type: :rectangle, content: '', wrap: true, border: nil)
       @id = id
       @children = children
       @parent = parent
@@ -18,6 +19,13 @@ module Panes
       @x = @y = @height = @width = 0
       @padding = Padding[*padding]
       @child_gap = child_gap || 0
+      @border = border
+      if border
+        @padding[:top] += 1
+        @padding[:right] += 1
+        @padding[:bottom] += 1
+        @padding[:left] += 1
+      end
 
       @w_sizing = Sizing.build(width)
       if fixed_width?
@@ -53,7 +61,7 @@ module Panes
       padding[:top] + padding[:bottom]
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, &block)
       node_parent = self
       @children << node = Node.new(
         id: id,
@@ -61,7 +69,8 @@ module Panes
         width: width,
         height: height,
         child_gap: child_gap,
-        padding: padding
+        padding: padding,
+        border: border
       )
 
       if block
@@ -156,25 +165,40 @@ module Panes
       }
     end
 
-    def bounding_box
+    def bounding_box(offset: 0)
       {
-        x:      x,
-        y:      y,
-        width:  width,
-        height: height
+        x:      x - offset,
+        y:      y - offset,
+        width:  width  + 2 * offset,
+        height: height + 2 * offset
       }
     end
 
     def to_commands
       case type
       when :rectangle
-        [
-          {
-            id: id,
-            type: :rectangle,
-            bounding_box: bounding_box
-          }
-        ]
+        if border
+          [
+            {
+              id: id,
+              type: :border,
+              bounding_box: bounding_box
+            },
+            {
+              id: id,
+              type: :rectangle,
+              bounding_box: bounding_box(offset: -1)
+            }
+          ]
+        else
+          [
+            {
+              id: id,
+              type: :rectangle,
+              bounding_box: bounding_box
+            }
+          ]
+        end
       when :inline_text
         result   = []
         y_offset = y
