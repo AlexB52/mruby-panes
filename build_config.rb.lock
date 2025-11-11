@@ -10,3 +10,8 @@ builds:
       branch: master
       commit: 34a477d249b0d21671058be33aa75d04c3e981ba
       version: 0.0.0
+    https://github.com/alexb52/mruby-termbox2.git:
+      url: https://github.com/alexb52/mruby-termbox2.git
+      branch: main
+      commit: 870765835a9b2d9ad7877ff27270ff5b3d413e1e
+      version: 0.0.0
