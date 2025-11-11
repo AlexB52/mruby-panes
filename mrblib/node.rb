@@ -1,21 +1,29 @@
 module Panes
   class Node
     include SizingHelpers
+    include DirectionHelpers
 
     attr_accessor :id, :parent, :children
     attr_accessor :type, :content, :wrap
     attr_accessor :border
-    attr_accessor :w_sizing, :h_sizing, :child_gap
+    attr_accessor :w_sizing, :h_sizing, :padding, :child_gap
     attr_accessor :x, :y, :width, :height
-    attr_accessor :padding
+    attr_accessor :direction
 
-    def initialize(id: nil, parent: nil, children: [], width: nil, height: nil, padding: [0], child_gap: 0, type: :rectangle, content: '', wrap: true, border: nil)
+    def initialize(
+      id: nil, parent: nil, children: [],
+      width: nil, height: nil,
+      padding: [0], child_gap: 0,
+      type: :rectangle, content: '', wrap: true, border: nil,
+      direction: :left_right)
+
       @id = id
       @children = children
       @parent = parent
       @content = content
       @wrap = wrap
       @type = type
+      @direction = direction
       @x = @y = @height = @width = 0
       @padding = Padding[*padding]
       @child_gap = child_gap || 0
@@ -54,14 +62,22 @@ module Panes
     end
 
     def total_width_spacing
-      padding[:left] + padding[:right] + [0, (children.length-1) * child_gap].max
+      result = padding[:left] + padding[:right]
+      if left_right?
+        result += [0, (children.length-1) * child_gap].max
+      end
+      result
     end
 
     def total_height_spacing
-      padding[:top] + padding[:bottom]
+      result = padding[:top] + padding[:bottom]
+      if top_bottom?
+        result += [0, (children.length-1) * child_gap].max
+      end
+      result
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, &block)
       node_parent = self
       @children << node = Node.new(
         id: id,
@@ -70,29 +86,39 @@ module Panes
         height: height,
         child_gap: child_gap,
         padding: padding,
-        border: border
+        border: border,
+        direction: direction,
       )
 
       if block
         node.instance_eval(&block)
       end
 
-      # Fit Width Adjustment
       if node.fit_width?
         node.width += node.total_width_spacing
       end
 
-      if node_parent.fit_width?
-        node_parent.width += node.min_width
-      end
-
-      # Fit Height Adjustment
       if node.fit_height?
         node.height += node.total_height_spacing
       end
 
-      if node_parent.fit_height?
-        node_parent.height = [node_parent.height, node.min_height].max
+      case node_parent.direction
+      when :left_right
+        if node_parent.fit_width?
+          node_parent.width += node.min_width
+        end
+
+        if node_parent.fit_height?
+          node_parent.height = [node_parent.height, node.min_height].max
+        end
+      when :top_bottom
+        if node_parent.fit_width?
+          node_parent.width = [node_parent.width, node.min_width].max
+        end
+
+        if node_parent.fit_height?
+          node_parent.height += node.min_height
+        end
       end
 
       node

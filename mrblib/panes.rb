@@ -26,21 +26,36 @@ module Panes
 
     def grow_width_containers(node)
       growables, sized = node.children.partition(&:grown_width?)
-      if growables.any?
-        extra_width = [0, node.width - node.total_width_spacing - sized.sum(&:width)].max
-        current_sizes = growables.map do |node|
-          {
-            current: node.width,
-            min: node.min_width,
-            max: node.max_width
-          }
+
+      if node.left_right?
+        if growables.any?
+          extra_width = [0, node.width - node.total_width_spacing - sized.sum(&:width)].max
+          current_sizes = growables.map do |node|
+            {
+              current: node.width,
+              min: node.min_width,
+              max: node.max_width
+            }
+          end
+
+          Calculations
+            .water_fill_distribution(current_sizes, extra_width)
+            .each.with_index do |extra, i|
+              growables[i].width += extra
+            end
+        end
+      else
+        if growables.any?
+          max_width = [node.width - node.total_width_spacing, 0].max
+          growables.each do |child|
+            child.width = [max_width, child.max_width].min
+          end
         end
 
-        Calculations
-          .water_fill_distribution(current_sizes, extra_width)
-          .each.with_index do |extra, i|
-            growables[i].width += extra
-          end
+        parent = node.parent
+        if parent&.fit_width?
+          parent.width = [parent.width, node.width].max
+        end
       end
 
       node.children.each do |child|
@@ -62,16 +77,36 @@ module Panes
 
     def grow_height_containers(node)
       growables, sized = node.children.reject(&:text?).partition(&:grown_height?)
-      if growables.any?
-        max_height = [node.height - node.total_height_spacing, 0].max
-        growables.each do |child|
-          child.height = [max_height, child.max_height].min
-        end
-      end
 
-      parent = node.parent
-      if parent&.fit_height?
-        parent.height = [parent.height, node.height].max
+      if node.left_right?
+        if growables.any?
+          max_height = [node.height - node.total_height_spacing, 0].max
+          growables.each do |child|
+            child.height = [max_height, child.max_height].min
+          end
+        end
+
+        parent = node.parent
+        if parent&.fit_height?
+          parent.height = [parent.height, node.height].max
+        end
+      else
+        if growables.any?
+          extra_height = [0, node.height - node.total_height_spacing - sized.sum(&:height)].max
+          current_sizes = growables.map do |node|
+            {
+              current: node.height,
+              min: node.min_height,
+              max: node.max_height
+            }
+          end
+
+          Calculations
+            .water_fill_distribution(current_sizes, extra_height)
+            .each.with_index do |extra, i|
+              growables[i].height += extra
+            end
+        end
       end
 
       node.children.each do |child|
@@ -90,7 +125,11 @@ module Panes
           offset_y + node.padding[:top]
         )
 
-        offset_x += child.width + node.child_gap
+        if node.left_right?
+          offset_x += child.width + node.child_gap
+        else
+          offset_y += child.height + node.child_gap
+        end
       end
     end
 
