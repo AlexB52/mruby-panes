@@ -102,21 +102,18 @@ module Panes
         node.height += node.total_height_spacing
       end
 
-      case node_parent.direction
-      when :left_right
-        if node_parent.fit_width?
+      if node_parent.fit_width?
+        if node_parent.left_right?
           node_parent.width += node.min_width
-        end
-
-        if node_parent.fit_height?
-          node_parent.height = [node_parent.height, node.min_height].max
-        end
-      when :top_bottom
-        if node_parent.fit_width?
+        else
           node_parent.width = [node_parent.width, node.min_width].max
         end
+      end
 
-        if node_parent.fit_height?
+      if node_parent.fit_height?
+        if node_parent.left_right?
+          node_parent.height = [node_parent.height, node.min_height].max
+        else
           node_parent.height += node.min_height
         end
       end
