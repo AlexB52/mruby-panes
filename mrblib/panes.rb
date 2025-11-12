@@ -20,9 +20,9 @@ module Panes
       grow_height_containers(@tree)
       set_positions(@tree)
 
-      @tree.children.flat_map do |node|
-        build_commands(node)
-      end
+      commands = []
+      @tree.children.each { |node| build_commands(node, out: commands) }
+      commands
     end
     alias :build :ui
 
@@ -135,14 +135,14 @@ module Panes
       end
     end
 
-    def build_commands(node)
+    def build_commands(node, out: [])
+      out.concat(node.to_commands)
+
       case node.type
       when :rectangle
-        node.to_commands + node.children.flat_map do |child|
-          build_commands(child)
+        node.children.each do |child|
+          build_commands(child, out: out)
         end
-      when :text, :inline_text
-        node.to_commands
       end
     end
   end

@@ -1,11 +1,16 @@
 Termbox2.init
 
 layout = Panes.init(width: Termbox2.width-1, height: Termbox2.height-1)
+time = Time.now
 
 begin
   while true
     layout.width = Termbox2.width-1
     layout.height = Termbox2.height-1
+
+    new_time = Time.now
+    duration = new_time - time
+    time = new_time
 
     commands = layout.build(id: 'root', width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1, direction: :top_bottom) do
       ui(id: '1st', width: Panes::Sizing.grow, height: Panes::Sizing.grow) do
@@ -15,7 +20,7 @@ begin
           TEXT
         end
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1) do
-          text("Hello, World!")
+          text("Duration: #{duration}")
         end
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1) do
           text("Hello, World!")
@@ -50,9 +55,9 @@ begin
     Panes::TBRender.render_commands(commands, tb: Termbox2)
     Termbox2.present
 
-    event = TB2.poll_event
+    event = Termbox2.peek_event(16)
     Termbox2.clear
-    break if event[:ch].chr == 'q'
+    break if event && event[:ch].chr == 'q'
   end
 ensure
   Termbox2.shutdown

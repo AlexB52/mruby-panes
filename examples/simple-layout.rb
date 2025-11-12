@@ -26,9 +26,9 @@ begin
     Panes::TBRender.render_commands(commands, tb: Termbox2)
     Termbox2.present
 
-    event = TB2.poll_event
+    event = Termbox2.peek_event(33)
     Termbox2.clear
-    break if event[:ch].chr == 'q'
+    break if event && event[:ch].chr == 'q'
   end
 ensure
   Termbox2.shutdown
