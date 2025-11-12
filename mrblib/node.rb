@@ -149,7 +149,6 @@ module Panes
         node_parent.content += node.content
       end
 
-      # Fit Width Adjustment - (unused)
       if node.fit_width?
         node.width += node.total_width_spacing
       end
@@ -158,7 +157,6 @@ module Panes
         node_parent.width += node.min_width
       end
 
-      # Fit Height Adjustment - (unused)
       if node.fit_height?
         node.height += node.total_height_spacing
       end
