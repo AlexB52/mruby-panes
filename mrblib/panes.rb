@@ -4,13 +4,15 @@ module Panes
   end
 
   class Layout
+    attr_accessor :width, :height
     def initialize(width:, height:)
       @width = width
       @height = height
-      @tree = Node.new(id: "__root__", width: width, height: height)
+      @tree = nil
     end
 
     def ui(**config, &block)
+      @tree = Node.new(id: "__root__", width: width, height: height)
       @tree.ui(**config, &block)
 
       grow_width_containers(@tree)

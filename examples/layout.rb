@@ -1,10 +1,12 @@
 Termbox2.init
 
+layout = Panes.init(width: Termbox2.width-1, height: Termbox2.height-1)
+
 begin
   while true
-    Termbox2.clear
+    layout.width = Termbox2.width-1
+    layout.height = Termbox2.height-1
 
-    layout = Panes.init(width: Termbox2.width, height: Termbox2.height)
     commands = layout.build(id: 'root', width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1, direction: :top_bottom) do
       ui(id: '1st', width: Panes::Sizing.grow, height: Panes::Sizing.grow) do
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1) do
@@ -49,6 +51,7 @@ begin
     Termbox2.present
 
     event = TB2.poll_event
+    Termbox2.clear
     break if event[:ch].chr == 'q'
   end
 ensure
