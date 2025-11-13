@@ -3,3 +3,11 @@
 git pull
 git submodule sync --recursive
 git submodule update --init --recursive --remote
+git add mruby
+
+if git diff --cached --quiet; then
+  echo "No dependency updates."
+  exit 0
+fi
+
+git commit -m "[DEPS] Bump mruby deps"
