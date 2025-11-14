@@ -81,7 +81,7 @@ module Panes
       result
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: nil, &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: nil, fg_color: nil, &block)
       node_parent = self
 
       @children << node = Node.new(
@@ -128,7 +128,7 @@ module Panes
       node
     end
 
-    def text(content = '', id: nil, wrap: true, bg_color: nil, &block)
+    def text(content = '', id: nil, wrap: true, bg_color: nil, fg_color: nil, &block)
       node_parent = self
 
       @children << node = Node.new(
