@@ -10,6 +10,7 @@ class TestWidthGrow < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 50, height: 30 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -29,24 +30,28 @@ class TestWidthGrow < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 200, height: 30 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 50, height: 20 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 50, y: 0, width: 75, height: 20 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'third',
         type: :rectangle,
         bounding_box: { x: 125, y: 0, width: 75, height: 20 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -66,24 +71,28 @@ class TestWidthGrow < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 200, height: 30 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 37.5, height: 20 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 37.5, y: 0, width: 125, height: 20 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'third',
         type: :rectangle,
         bounding_box: { x: 162.5, y: 0, width: 37.5, height: 20 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -102,18 +111,21 @@ class TestWidthGrow < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 200, height: 30 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 5, y: 5, width: 50, height: 20 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 60, y: 5, width: 135, height: 20 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end

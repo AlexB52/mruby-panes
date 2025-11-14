@@ -10,6 +10,7 @@ class TestHeightGrowth < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 50, height: 100 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -29,24 +30,28 @@ class TestHeightGrowth < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 30, height: 200 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 30, height: 100 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 0, y: 100, width: 20, height: 50 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'third',
         type: :rectangle,
         bounding_box: { x: 0, y: 150, width: 30, height: 50 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -65,18 +70,21 @@ class TestHeightGrowth < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 200, height: 200 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 5, y: 5, width: 50, height: 100 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 5, y: 110, width: 190, height: 85 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -95,18 +103,21 @@ class TestHeightGrowth < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 135, height: 200 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 5, y: 5, width: 50, height: 100 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 5, y: 110, width: 125, height: 85 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
