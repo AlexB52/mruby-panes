@@ -9,6 +9,7 @@ class TestHeightGrowth < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 100, height: 50 },
+        bg_color: 0,
       },
     ], commands)
   end
@@ -27,21 +28,25 @@ class TestHeightGrowth < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 200, height: 30 },
+        bg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 100, height: 30 },
+        bg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 100, y: 0, width: 50, height: 20 },
+        bg_color: 0,
       },
       {
         id: 'third',
         type: :rectangle,
         bounding_box: { x: 150, y: 0, width: 50, height: 30 },
+        bg_color: 0,
       },
     ], commands)
   end
@@ -59,16 +64,19 @@ class TestHeightGrowth < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 200, height: 200 },
+        bg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 5, y: 5, width: 100, height: 50 },
+        bg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 110, y: 5, width: 85, height: 190 },
+        bg_color: 0,
       },
     ], commands)
   end
@@ -86,16 +94,19 @@ class TestHeightGrowth < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 200, height: 135 },
+        bg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 5, y: 5, width: 100, height: 50 },
+        bg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 110, y: 5, width: 85, height: 125 },
+        bg_color: 0,
       },
     ], commands)
   end

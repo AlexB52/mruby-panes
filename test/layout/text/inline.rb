@@ -14,18 +14,21 @@ class TestInlineText < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 17, height: 1 },
+        bg_color: 0,
       },
       {
         id: 'text',
         type: :text,
         text: "Prenom: ",
         bounding_box: { x: 0, y: 0, width: 8, height: 1 },
+        bg_color: 0,
       },
       {
         id: 'text',
         type: :text,
         text: "Alexandre",
         bounding_box: { x: 8, y: 0, width: 9, height: 1 },
+        bg_color: 0,
       },
     ], commands)
   end
@@ -52,34 +55,38 @@ class TestInlineText < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 51, height: 3 },
+        bg_color: 0,
       },
       {
         id: 'text',
         type: :text,
         text: "Lorem ipsum dolor sit amet, consectetur adipisicing",
         bounding_box: { x: 0, y: 0, width: 51, height: 1 },
+        bg_color: 0,
       },
       {
         id: 'text',
         type: :text,
         text: "elit, sed do eiusmod ",
         bounding_box: { x: 0, y: 1, width: 21, height: 1 },
+        bg_color: 0,
       },
       {
         id: 'text',
         type: :text,
         text: "tempor incididunt ut labore et",
         bounding_box: { x: 21, y: 1, width: 30, height: 1 },
+        bg_color: 0,
       },
       {
         id: 'text',
         type: :text,
         text: "dolore magna aliqua. Ut enim ad minim veniam,",
         bounding_box: { x: 0, y: 2, width: 45, height: 1 },
+        bg_color: 0,
       },
     ], commands)
   end
 end
 
 MTest::Unit.new.run
-

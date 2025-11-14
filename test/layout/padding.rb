@@ -12,16 +12,19 @@ class TestPaddings < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 52, height: 32 },
+        bg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 1, y: 1, width: 20, height: 20 },
+        bg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 21, y: 1, width: 30, height: 30 },
+        bg_color: 0,
       }
     ], commands)
   end
@@ -43,26 +46,31 @@ class TestPaddings < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 52, height: 32 },
+        bg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 1, y: 1, width: 20, height: 20 },
+        bg_color: 0,
       },
       {
         id: 'three',
         type: :rectangle,
         bounding_box: { x: 3, y: 3, width: 10, height: 10 },
+        bg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 21, y: 1, width: 30, height: 30 },
+        bg_color: 0,
       },
       {
         id: 'four',
         type: :rectangle,
         bounding_box: { x: 24, y: 4, width: 10, height: 20 },
+        bg_color: 0,
       }
     ], commands)
   end
@@ -84,26 +92,31 @@ class TestPaddings < MTest::Unit::TestCase
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 57, height: 32 },
+        bg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 1, y: 1, width: 20, height: 20 },
+        bg_color: 0,
       },
       {
         id: 'three',
         type: :rectangle,
         bounding_box: { x: 3, y: 3, width: 10, height: 10 },
+        bg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 26, y: 1, width: 30, height: 30 },
+        bg_color: 0,
       },
       {
         id: 'four',
         type: :rectangle,
         bounding_box: { x: 29, y: 4, width: 10, height: 20 },
+        bg_color: 0,
       }
     ], commands)
   end
