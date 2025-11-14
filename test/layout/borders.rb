@@ -10,12 +10,14 @@ class TestWidthGrow < MTest::Unit::TestCase
         type: :border,
         bounding_box: { x: 0, y: 0, width: 50, height: 50 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 1, y: 1, width: 48, height: 48 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -33,12 +35,14 @@ class TestWidthGrow < MTest::Unit::TestCase
         type: :border,
         bounding_box: { x: 0, y: 0, width: 50, height: 50 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 1, y: 1, width: 48, height: 48 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'text',
@@ -46,6 +50,7 @@ class TestWidthGrow < MTest::Unit::TestCase
         text: "Hello, World!",
         bounding_box: { x: 1, y: 1, width: 13, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -64,36 +69,42 @@ class TestWidthGrow < MTest::Unit::TestCase
         type: :border,
         bounding_box: { x: 0, y: 0, width: 50, height: 50 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'root',
         type: :rectangle,
         bounding_box: { x: 1, y: 1, width: 48, height: 48 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '1st',
         type: :border,
         bounding_box: { x: 1, y: 1, width: 24, height: 48 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '1st',
         type: :rectangle,
         bounding_box: { x: 2, y: 2, width: 22, height: 46 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '2nd',
         type: :border,
         bounding_box: { x: 25, y: 1, width: 24, height: 48 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '2nd',
         type: :rectangle,
         bounding_box: { x: 26, y: 2, width: 22, height: 46 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -116,54 +127,63 @@ class TestWidthGrow < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 200, height: 200 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '1st',
         type: :border,
         bounding_box: { x: 0, y: 0, width: 100, height: 200 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '1st',
         type: :rectangle,
         bounding_box: { x: 1, y: 1, width: 98, height: 198 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '3rd',
         type: :border,
         bounding_box: { x: 11, y: 11, width: 30, height: 178 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '3rd',
         type: :rectangle,
         bounding_box: { x: 12, y: 12, width: 28, height: 176 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '4th',
         type: :border,
         bounding_box: { x: 51, y: 11, width: 38, height: 178 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '4th',
         type: :rectangle,
         bounding_box: { x: 52, y: 12, width: 36, height: 176 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '2nd',
         type: :border,
         bounding_box: { x: 100, y: 0, width: 100, height: 200 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: '2nd',
         type: :rectangle,
         bounding_box: { x: 101, y: 1, width: 98, height: 198 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end

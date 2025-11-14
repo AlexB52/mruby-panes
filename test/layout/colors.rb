@@ -10,6 +10,7 @@ class TestColors < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
         bg_color: 5,
+        fg_color: 0,
       }
     ], commands)
   end
@@ -30,18 +31,21 @@ class TestColors < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 60, height: 60 },
         bg_color: 2,
+        fg_color: 0,
       },
       {
         id: nil,
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
         bg_color: 2,
+        fg_color: 0,
       },
       {
         id: nil,
         type: :rectangle,
         bounding_box: { x: 20, y: 0, width: 30, height: 30 },
         bg_color: 0,
+        fg_color: 0,
       }
     ], commands)
   end
@@ -64,30 +68,35 @@ class TestColors < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 50, height: 30 },
         bg_color: 3,
+        fg_color: 0,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
         bg_color: 3,
+        fg_color: 0,
       },
       {
         id: 'three',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 10, height: 20 },
         bg_color: 3,
+        fg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
         bounding_box: { x: 20, y: 0, width: 30, height: 30 },
         bg_color: 3,
+        fg_color: 0,
       },
       {
         id: 'four',
         type: :rectangle,
         bounding_box: { x: 20, y: 0, width: 10, height: 20 },
         bg_color: 3,
+        fg_color: 0,
       }
     ], commands)
   end
@@ -95,11 +104,11 @@ class TestColors < MTest::Unit::TestCase
   def test_with_text
     layout = Panes.init(width: 60, height: 60)
 
-    commands = layout.build(id: 'root', bg_color: :green) do
+    commands = layout.build(id: 'root', bg_color: :green, fg_color: :blue) do
       ui(id: 'one', width: 20, height: 20) do
         text(id: 'text') do
           text("Hello, ")
-          text("World!", bg_color: :red)
+          text("World!", bg_color: :red, fg_color: :white)
         end
       end
     end
@@ -110,12 +119,14 @@ class TestColors < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
         bg_color: 3,
+        fg_color: 5,
       },
       {
         id: 'one',
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
         bg_color: 3,
+        fg_color: 5,
       },
       {
         id: 'text',
@@ -123,6 +134,7 @@ class TestColors < MTest::Unit::TestCase
         text: 'Hello, ',
         bounding_box: { x: 0, y: 0 , width: 7, height: 1 },
         bg_color: 3,
+        fg_color: 5,
       },
       {
         id: 'text',
@@ -130,6 +142,7 @@ class TestColors < MTest::Unit::TestCase
         text: 'World!',
         bounding_box: { x: 7, y: 0 , width: 6, height: 1 },
         bg_color: 2,
+        fg_color: 8,
       },
     ], commands)
   end

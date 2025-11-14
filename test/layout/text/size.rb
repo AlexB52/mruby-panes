@@ -12,6 +12,7 @@ class TestTextSize < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 13, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'text',
@@ -19,6 +20,7 @@ class TestTextSize < MTest::Unit::TestCase
         text: "Hello, World!",
         bounding_box: { x: 0, y: 0, width: 13, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -36,6 +38,7 @@ class TestTextSize < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 100, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'text',
@@ -43,6 +46,7 @@ class TestTextSize < MTest::Unit::TestCase
         text: "Hello, World!",
         bounding_box: { x: 0, y: 0, width: 13, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -60,6 +64,7 @@ class TestTextSize < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 28, height: 3 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'text',
@@ -67,6 +72,7 @@ class TestTextSize < MTest::Unit::TestCase
         text: "Lorem ipsum dolor sit amet,",
         bounding_box: { x: 0, y: 0, width: 27, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'text',
@@ -74,6 +80,7 @@ class TestTextSize < MTest::Unit::TestCase
         text: "consectetur adipisicing",
         bounding_box: { x: 0, y: 1, width: 23, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'text',
@@ -81,6 +88,7 @@ class TestTextSize < MTest::Unit::TestCase
         text: "elit, sed do eiusmod tempor",
         bounding_box: { x: 0, y: 2, width: 27, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end
@@ -98,6 +106,7 @@ class TestTextSize < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 6, height: 2 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'text',
@@ -105,6 +114,7 @@ class TestTextSize < MTest::Unit::TestCase
         text: "Hello,",
         bounding_box: { x: 0, y: 0, width: 6, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
       {
         id: 'text',
@@ -112,6 +122,7 @@ class TestTextSize < MTest::Unit::TestCase
         text: "World!",
         bounding_box: { x: 0, y: 1, width: 6, height: 1 },
         bg_color: 0,
+        fg_color: 0,
       },
     ], commands)
   end

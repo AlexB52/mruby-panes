@@ -9,7 +9,7 @@ module Panes
     attr_accessor :w_sizing, :h_sizing, :padding, :child_gap
     attr_accessor :x, :y, :width, :height
     attr_accessor :direction
-    attr_accessor :bg_color
+    attr_accessor :bg_color, :fg_color
 
     def initialize(
       id: nil, parent: nil, children: [],
@@ -17,7 +17,7 @@ module Panes
       padding: [0], child_gap: 0,
       type: :rectangle, content: '', wrap: true, border: nil,
       direction: :left_right,
-      bg_color: 0)
+      bg_color: 0, fg_color: 0)
 
       @id = id
       @children = children
@@ -27,6 +27,7 @@ module Panes
       @type = type
       @direction = direction
       @bg_color = Colors.parse(bg_color)
+      @fg_color = Colors.parse(fg_color)
       @x = @y = @height = @width = 0
       @padding = Padding[*padding]
       @child_gap = child_gap || 0
@@ -80,7 +81,7 @@ module Panes
       result
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: nil, &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: nil, fg_color: nil, &block)
       node_parent = self
 
       @children << node = Node.new(
@@ -92,7 +93,8 @@ module Panes
         padding: padding,
         border: border,
         direction: direction,
-        bg_color: bg_color || node_parent.bg_color
+        bg_color: bg_color || node_parent.bg_color,
+        fg_color: fg_color || node_parent.fg_color,
       )
 
       if block
@@ -126,7 +128,7 @@ module Panes
       node
     end
 
-    def text(content = '', id: nil, wrap: true, bg_color: nil, &block)
+    def text(content = '', id: nil, wrap: true, bg_color: nil, fg_color: nil, &block)
       node_parent = self
 
       @children << node = Node.new(
@@ -137,7 +139,8 @@ module Panes
         wrap: wrap,
         width: Sizing.grow,
         height: Sizing.grow,
-        bg_color: bg_color || node_parent.bg_color
+        bg_color: bg_color || node_parent.bg_color,
+        fg_color: fg_color || node_parent.fg_color,
       )
 
       if block
@@ -214,12 +217,14 @@ module Panes
               type: :border,
               bounding_box: bounding_box,
               bg_color: bg_color,
+              fg_color: fg_color,
             },
             {
               id: id,
               type: :rectangle,
               bounding_box: bounding_box(offset: -1),
               bg_color: bg_color,
+              fg_color: fg_color,
             }
           ]
         else
@@ -229,6 +234,7 @@ module Panes
               type: :rectangle,
               bounding_box: bounding_box,
               bg_color: bg_color,
+              fg_color: fg_color,
             }
           ]
         end
@@ -242,18 +248,19 @@ module Panes
         child_content = child&.content.to_s
         child_pos     = 0
 
-        new_cmd = ->(x0, y0, bg_color = 0) do
+        new_cmd = ->(x0, y0, bg_color = 0, fg_color = 0) do
           {
             id: id,
             type: :text,
             text: "",
             bounding_box: { x: x0, y: y0, width: 0, height: 1 },
-            bg_color: bg_color
+            bg_color: bg_color,
+            fg_color: fg_color,
           }
         end
 
         Text.wrap(content, width: width).each do |line|
-          cmd = new_cmd.call(x, y_offset, child.bg_color)
+          cmd = new_cmd.call(x, y_offset, child.bg_color, child.fg_color)
 
           if line.empty?
             result << cmd
@@ -269,7 +276,7 @@ module Panes
               child         = child_enum.next
               child_content = child&.content.to_s
               child_pos     = 0
-              cmd = new_cmd.call(cmd[:bounding_box][:x] + cmd[:bounding_box][:width], y_offset, child.bg_color)
+              cmd = new_cmd.call(cmd[:bounding_box][:x] + cmd[:bounding_box][:width], y_offset, child.bg_color, child.fg_color)
             end
 
             take = [line.length - line_pos, child_content.length - child_pos].min
@@ -294,7 +301,8 @@ module Panes
             type: :text,
             text: line,
             bounding_box: { x: x, y: y + i, width: line.length, height: 1 },
-            bg_color: bg_color
+            bg_color: bg_color,
+            fg_color: fg_color,
           }
         end
       end
