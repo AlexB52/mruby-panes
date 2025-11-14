@@ -9,13 +9,15 @@ module Panes
     attr_accessor :w_sizing, :h_sizing, :padding, :child_gap
     attr_accessor :x, :y, :width, :height
     attr_accessor :direction
+    attr_accessor :bg_color
 
     def initialize(
       id: nil, parent: nil, children: [],
       width: nil, height: nil,
       padding: [0], child_gap: 0,
       type: :rectangle, content: '', wrap: true, border: nil,
-      direction: :left_right)
+      direction: :left_right,
+      bg_color: 0)
 
       @id = id
       @children = children
@@ -24,6 +26,7 @@ module Panes
       @wrap = wrap
       @type = type
       @direction = direction
+      @bg_color = Colors.parse(bg_color)
       @x = @y = @height = @width = 0
       @padding = Padding[*padding]
       @child_gap = child_gap || 0
@@ -77,7 +80,7 @@ module Panes
       result
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: 0, &block)
       node_parent = self
       @children << node = Node.new(
         id: id,
@@ -88,6 +91,7 @@ module Panes
         padding: padding,
         border: border,
         direction: direction,
+        bg_color: bg_color
       )
 
       if block
@@ -205,12 +209,14 @@ module Panes
             {
               id: id,
               type: :border,
-              bounding_box: bounding_box
+              bounding_box: bounding_box,
+              bg_color: bg_color,
             },
             {
               id: id,
               type: :rectangle,
-              bounding_box: bounding_box(offset: -1)
+              bounding_box: bounding_box(offset: -1),
+              bg_color: bg_color,
             }
           ]
         else
@@ -218,7 +224,8 @@ module Panes
             {
               id: id,
               type: :rectangle,
-              bounding_box: bounding_box
+              bounding_box: bounding_box,
+              bg_color: bg_color,
             }
           ]
         end
@@ -231,7 +238,13 @@ module Panes
         child_pos  = 0
 
         new_cmd = ->(x0, y0) do
-          { id: id, type: :text, text: "", bounding_box: { x: x0, y: y0, width: 0, height: 1 } }
+          {
+            id: id,
+            type: :text,
+            text: "",
+            bounding_box: { x: x0, y: y0, width: 0, height: 1 },
+            bg_color: bg_color
+          }
         end
 
         Text.wrap(content, width: width).each do |line|
@@ -274,7 +287,8 @@ module Panes
             id: id,
             type: :text,
             text: line,
-            bounding_box: { x: x, y: y + i, width: line.length, height: 1 }
+            bounding_box: { x: x, y: y + i, width: line.length, height: 1 },
+            bg_color: bg_color
           }
         end
       end
