@@ -80,8 +80,9 @@ module Panes
       result
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: 0, &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: nil, &block)
       node_parent = self
+
       @children << node = Node.new(
         id: id,
         parent: self,
@@ -91,7 +92,7 @@ module Panes
         padding: padding,
         border: border,
         direction: direction,
-        bg_color: bg_color
+        bg_color: bg_color || node_parent.bg_color
       )
 
       if block
