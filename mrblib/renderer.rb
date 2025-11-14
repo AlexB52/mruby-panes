@@ -3,29 +3,30 @@ module Panes
   module TBRender
     def self.render_commands(commands, tb: Termbox2)
       commands.each do |command|
-        bbox = command[:bounding_box]
+        bbox     = command[:bounding_box]
+        bg_color = command[:bg_color]
+
+        x0 = (bbox[:x]).to_i
+        x1 = (bbox[:x]+bbox[:width]).to_i
+        y0 = (bbox[:y]).to_i
+        y1 = (bbox[:y]+bbox[:height]).to_i
 
         case command[:type]
         when :rectangle
+          line = ' ' * (x1-x0+1)
+          tb.print(bbox[:x], bbox[:y], 0, bg_color, line)
         when :text
-          tb.print(bbox[:x], bbox[:y], 0, 0, command[:text])
+          tb.print(bbox[:x], bbox[:y], 0, bg_color, command[:text])
         when :border
-          c = '+'.ord
-          x0 = (bbox[:x]).to_i
-          x1 = (bbox[:x]+bbox[:width]).to_i
-          y0 = (bbox[:y]).to_i
-          y1 = (bbox[:y]+bbox[:height]).to_i
+          tb.print(x0, y0, 0, bg_color, '-' * (x1-x0+1))
+          tb.print(x0, y1, 0, bg_color, '-' * (x1-x0+1))
+          (y0..y1).each { |y| tb.set_cell(x0, y, 0, bg_color, '|'.ord) }
+          (y0..y1).each { |y| tb.set_cell(x1, y, 0, bg_color, '|'.ord) }
 
-
-          tb.print(x0, y0, 0, 0, '-' * (x1-x0+1))
-          tb.print(x0, y1, 0, 0, '-' * (x1-x0+1))
-          (y0..y1).each { |y| tb.set_cell(x0, y, 0, 0, '|'.ord) }
-          (y0..y1).each { |y| tb.set_cell(x1, y, 0, 0, '|'.ord) }
-
-          tb.set_cell(x0, y0, 0, 0, c)
-          tb.set_cell(x1, y0, 0, 0, c)
-          tb.set_cell(x0, y1, 0, 0, c)
-          tb.set_cell(x1, y1, 0, 0, c)
+          tb.set_cell(x0, y0, 0, bg_color, '+'.ord)
+          tb.set_cell(x1, y0, 0, bg_color, '+'.ord)
+          tb.set_cell(x0, y1, 0, bg_color, '+'.ord)
+          tb.set_cell(x1, y1, 0, bg_color, '+'.ord)
         end
       end
     end
