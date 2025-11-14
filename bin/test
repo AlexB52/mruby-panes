@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-
+bin/build
 ./mruby/bin/mruby  -r test/support.rb $@
