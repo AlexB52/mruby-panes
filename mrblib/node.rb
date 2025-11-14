@@ -214,18 +214,18 @@ module Panes
           [
             {
               id: id,
-              type: :border,
+              type: :rectangle,
               bounding_box: bounding_box,
               bg_color: bg_color,
               fg_color: fg_color,
             },
             {
               id: id,
-              type: :rectangle,
-              bounding_box: bounding_box(offset: -1),
+              type: :border,
+              bounding_box: bounding_box,
               bg_color: bg_color,
               fg_color: fg_color,
-            }
+            },
           ]
         else
           [
