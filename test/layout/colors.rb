@@ -2,7 +2,7 @@ class TestColors < MTest::Unit::TestCase
   def test_simple_node
     layout = Panes.init(width: 60, height: 60)
 
-    commands = layout.build(width: 20, height: 20, bg_color: :blue)
+    commands = layout.build(width: 20, height: 20, bg_color: :blue, fg_color: :red)
 
     assert_commands([
       {
@@ -10,7 +10,7 @@ class TestColors < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
         bg_color: 5,
-        fg_color: 0,
+        fg_color: 2,
       }
     ], commands)
   end
@@ -20,7 +20,7 @@ class TestColors < MTest::Unit::TestCase
 
     layout = Panes.init(width: 60, height: 60)
 
-    commands = layout.build(width: 60, height: 60, bg_color: :red) do
+    commands = layout.build(width: 60, height: 60, bg_color: :red, fg_color: :blue) do
       ui(width: 20, height: 20)
       ui(width: 30, height: 30, bg_color: 0)
     end
@@ -31,21 +31,21 @@ class TestColors < MTest::Unit::TestCase
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 60, height: 60 },
         bg_color: 2,
-        fg_color: 0,
+        fg_color: 5,
       },
       {
         id: nil,
         type: :rectangle,
         bounding_box: { x: 0, y: 0, width: 20, height: 20 },
         bg_color: 2,
-        fg_color: 0,
+        fg_color: 5,
       },
       {
         id: nil,
         type: :rectangle,
         bounding_box: { x: 20, y: 0, width: 30, height: 30 },
         bg_color: 0,
-        fg_color: 0,
+        fg_color: 5,
       }
     ], commands)
   end
