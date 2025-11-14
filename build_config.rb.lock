@@ -2,7 +2,6 @@
 mruby:
   version: 3.4.0
   release_no: 30400
-  git_commit: 729b84cf26d8c7519e17f37b4f6a9e9c3819a88a
 builds:
   host:
     https://github.com/iij/mruby-mtest.git:
