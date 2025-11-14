@@ -80,8 +80,9 @@ module Panes
       result
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: 0, &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: nil, &block)
       node_parent = self
+
       @children << node = Node.new(
         id: id,
         parent: self,
@@ -91,7 +92,7 @@ module Panes
         padding: padding,
         border: border,
         direction: direction,
-        bg_color: bg_color
+        bg_color: bg_color || node_parent.bg_color
       )
 
       if block
@@ -125,8 +126,9 @@ module Panes
       node
     end
 
-    def text(content = '', id: nil, wrap: true, &block)
+    def text(content = '', id: nil, wrap: true, bg_color: nil, &block)
       node_parent = self
+
       @children << node = Node.new(
         id: id,
         parent: self,
@@ -135,6 +137,7 @@ module Panes
         wrap: wrap,
         width: Sizing.grow,
         height: Sizing.grow,
+        bg_color: bg_color || node_parent.bg_color
       )
 
       if block
@@ -233,11 +236,13 @@ module Panes
         result   = []
         y_offset = y
 
-        child_enum = children.each
-        child      = child_enum.next&.content.to_s
-        child_pos  = 0
+        child_enum    = children.each
 
-        new_cmd = ->(x0, y0) do
+        child         = child_enum.next
+        child_content = child&.content.to_s
+        child_pos     = 0
+
+        new_cmd = ->(x0, y0, bg_color = 0) do
           {
             id: id,
             type: :text,
@@ -248,7 +253,7 @@ module Panes
         end
 
         Text.wrap(content, width: width).each do |line|
-          cmd = new_cmd.call(x, y_offset)
+          cmd = new_cmd.call(x, y_offset, child.bg_color)
 
           if line.empty?
             result << cmd
@@ -258,17 +263,18 @@ module Panes
 
           line_pos = 0
           while line_pos < line.length
-            if child_pos >= child.length # get a new child
+            if child_pos >= child_content.length # get a new child
               result << cmd
 
-              child     = child_enum.next&.content.to_s
-              child_pos = 0
-              cmd = new_cmd.call(cmd[:bounding_box][:x] + cmd[:bounding_box][:width], y_offset)
+              child         = child_enum.next
+              child_content = child&.content.to_s
+              child_pos     = 0
+              cmd = new_cmd.call(cmd[:bounding_box][:x] + cmd[:bounding_box][:width], y_offset, child.bg_color)
             end
 
-            take = [line.length - line_pos, child.length - child_pos].min
+            take = [line.length - line_pos, child_content.length - child_pos].min
 
-            segment = child.byteslice(child_pos, take)
+            segment = child_content.byteslice(child_pos, take)
             cmd[:text] << segment
             cmd[:bounding_box][:width] += take
 
