@@ -41,7 +41,10 @@ begin
 
       ui(id: '2nd', width: Panes::Sizing.grow, height: Panes::Sizing.grow) do
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1) do
-          text("Hello, World!")
+          text do
+            text("Hello, ", bg_color: :yellow)
+            text("World!", bg_color: :red)
+          end
         end
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1) do
           text("Hello, World!")

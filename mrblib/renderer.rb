@@ -14,7 +14,7 @@ module Panes
         case command[:type]
         when :rectangle
           line = ' ' * (x1-x0+1)
-          tb.print(bbox[:x], bbox[:y], 0, bg_color, line)
+          (y0..y1).each { |y| tb.print(bbox[:x], y, 0, bg_color, line) }
         when :text
           tb.print(bbox[:x], bbox[:y], 0, bg_color, command[:text])
         when :border
