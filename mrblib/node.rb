@@ -72,15 +72,10 @@ module Panes
     end
 
     def alignment_offset(width_available)
-      return 0 unless width_available
-      return 0 if width_available <= 0
+      return 0 unless width_available && width_available > 0
+      return 0 if width_available.respond_to?(:finite?) && !width_available.finite?
 
-      available =
-        if width_available.respond_to?(:finite?) && !width_available.finite?
-          0
-        else
-          width_available.floor
-        end
+      available = width_available.floor
 
       case align
       when :right
