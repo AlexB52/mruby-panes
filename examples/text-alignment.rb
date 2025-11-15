@@ -15,15 +15,28 @@ begin
     layout.width = Termbox2.width
     layout.height = Termbox2.height
 
-    commands = layout.build(id: 'root', width: Panes::Sizing.grow, height: Panes::Sizing.grow) do
-      ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
-        text(lorem_ipsum, align: :left)
+    commands = layout.build(id: 'root', width: Panes::Sizing.grow, height: Panes::Sizing.grow, direction: :top_bottom) do
+      ui(width: Panes::Sizing.grow) do
+        ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
+          text(lorem_ipsum, align: :left)
+        end
+        ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
+          text(lorem_ipsum, align: :center)
+        end
+        ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
+          text(lorem_ipsum, align: :right)
+        end
       end
-      ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
-        text(lorem_ipsum, align: :center)
-      end
-      ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
-        text(lorem_ipsum, align: :right)
+      ui(width: Panes::Sizing.grow) do
+        ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
+          text("Hello, World!", align: :left)
+        end
+        ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
+          text("Hello, World!", align: :center)
+        end
+        ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
+          text("Hello, World!", align: :right)
+        end
       end
     end
 
