@@ -31,12 +31,12 @@ module Panes
       @x = @y = @height = @width = 0
       @padding = Padding[*padding]
       @child_gap = child_gap || 0
-      @border = border
+      @border = Borders.parse(**(border || {}))
       if border
-        @padding[:top] += 1
-        @padding[:right] += 1
-        @padding[:bottom] += 1
-        @padding[:left] += 1
+        @padding[:top]    += 1 if @border[:top]
+        @padding[:right]  += 1 if @border[:right]
+        @padding[:bottom] += 1 if @border[:bottom]
+        @padding[:left]   += 1 if @border[:left]
       end
 
       @w_sizing = Sizing.build(width)
@@ -210,34 +210,28 @@ module Panes
     def to_commands
       case type
       when :rectangle
+        result = [
+         {
+           id: id,
+           type: :rectangle,
+           bounding_box: bounding_box,
+           bg_color: bg_color,
+           fg_color: fg_color,
+         }
+        ]
+
         if border
-          [
-            {
-              id: id,
-              type: :border,
-              bounding_box: bounding_box,
-              bg_color: bg_color,
-              fg_color: fg_color,
-            },
-            {
-              id: id,
-              type: :rectangle,
-              bounding_box: bounding_box(offset: -1),
-              bg_color: bg_color,
-              fg_color: fg_color,
-            }
-          ]
-        else
-          [
-            {
-              id: id,
-              type: :rectangle,
-              bounding_box: bounding_box,
-              bg_color: bg_color,
-              fg_color: fg_color,
-            }
-          ]
+          result << {
+            id: id,
+            type: :border,
+            border: border,
+            bounding_box: bounding_box,
+            bg_color: bg_color,
+            fg_color: fg_color,
+          }
         end
+
+        result
       when :inline_text
         result   = []
         y_offset = y

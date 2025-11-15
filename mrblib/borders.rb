@@ -1,29 +1,29 @@
 module Panes
   module Borders
-    def self.parse(*args, **kwargs)
+    def self.parse(all: nil, top: nil, right: nil, bottom: nil, left: nil)
       result = {}
 
-      if args.any?
-        result[:top] = result[:left] = result[:right] = result[:bottom] = config(args)
+      if all&.any?
+        result[:top] = result[:left] = result[:right] = result[:bottom] = config(all)
       end
 
-      if kwargs[:top]
-        result[:top] = config(kwargs[:top])
+      if top
+        result[:top] = config(top)
       end
 
-      if kwargs[:right]
-        result[:right] = config(kwargs[:right])
+      if right
+        result[:right] = config(right)
       end
 
-      if kwargs[:bottom]
-        result[:bottom] = config(kwargs[:bottom])
+      if bottom
+        result[:bottom] = config(bottom)
       end
 
-      if kwargs[:left]
-        result[:left] = config(kwargs[:left])
+      if left
+        result[:left] = config(left)
       end
 
-      result
+      result if result.any?
     end
 
     def self.config(configuration)

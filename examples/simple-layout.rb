@@ -1,6 +1,6 @@
 Termbox2.init
 
-layout = Panes.init(width: Termbox2.width-1, height: Termbox2.height-1)
+layout = Panes.init(width: Termbox2.width, height: Termbox2.height)
 
 time = Time.now
 
@@ -10,12 +10,12 @@ begin
     duration = new_time - time
     time = new_time
 
-    layout.width = Termbox2.width-1
-    layout.height = Termbox2.height-1
+    layout.width = Termbox2.width
+    layout.height = Termbox2.height
 
-    commands = layout.build(id: 'root', width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1, direction: :top_bottom) do
+    commands = layout.build(id: 'root', width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: { all: [:default, :default] }, direction: :top_bottom) do
       ui(id: '1st', width: Panes::Sizing.grow, height: Panes::Sizing.grow) do
-        ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: 1) do
+        ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: { all: [:default, :default] }) do
           text(<<~TEXT)
             Duration of the cycle #{duration}
           TEXT
