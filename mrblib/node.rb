@@ -3,6 +3,9 @@ module Panes
     include SizingHelpers
     include DirectionHelpers
 
+    POSITION_VERTICALS = [:top, :middle, :bottom].freeze
+    POSITION_HORIZONTALS = [:left, :center, :right].freeze
+
     attr_accessor :id, :parent, :children
     attr_accessor :type, :content, :wrap
     attr_accessor :border
@@ -10,6 +13,7 @@ module Panes
     attr_accessor :x, :y, :width, :height
     attr_accessor :direction
     attr_accessor :bg_color, :fg_color
+    attr_reader :position, :position_vertical, :position_horizontal
 
     def initialize(
       id: nil, parent: nil, children: [],
@@ -17,6 +21,7 @@ module Panes
       padding: [0], child_gap: 0,
       type: :rectangle, content: '', wrap: true, border: nil,
       direction: :left_right,
+      position: nil,
       bg_color: 0, fg_color: 0)
 
       @id = id
@@ -39,6 +44,8 @@ module Panes
         @padding[:left]   += 1 if @border[:left]
       end
 
+      self.position = position
+
       @w_sizing = Sizing.build(width)
       if fixed_width?
         @width = min_width
@@ -48,6 +55,34 @@ module Panes
       if fixed_height?
         @height = min_height
       end
+    end
+
+    def position=(value)
+      @position = nil
+      @position_vertical = nil
+      @position_horizontal = nil
+
+      return if value.nil?
+
+      unless value.is_a?(Symbol)
+        raise ArgumentError, 'position must be a Symbol combining vertical and horizontal alignment'
+      end
+
+      vertical_str, horizontal_str = value.to_s.split('_', 2)
+      unless vertical_str && horizontal_str
+        raise ArgumentError, 'position must combine vertical and horizontal alignment, e.g. :top_left'
+      end
+
+      vertical = vertical_str.to_sym
+      horizontal = horizontal_str.to_sym
+
+      unless POSITION_VERTICALS.include?(vertical) && POSITION_HORIZONTALS.include?(horizontal)
+        raise ArgumentError, "position #{value.inspect} is invalid"
+      end
+
+      @position = value
+      @position_vertical = vertical
+      @position_horizontal = horizontal
     end
 
     def text?
@@ -65,10 +100,19 @@ module Panes
       node.children << self
     end
 
+    def positioned?
+      !@position.nil?
+    end
+
+    def flow_children
+      children.reject(&:positioned?)
+    end
+
     def total_width_spacing
       result = padding[:left] + padding[:right]
       if left_right?
-        result += [0, (children.length-1) * child_gap].max
+        flow_count = flow_children.length
+        result += [0, (flow_count - 1) * child_gap].max
       end
       result
     end
@@ -76,12 +120,13 @@ module Panes
     def total_height_spacing
       result = padding[:top] + padding[:bottom]
       if top_bottom?
-        result += [0, (children.length-1) * child_gap].max
+        flow_count = flow_children.length
+        result += [0, (flow_count - 1) * child_gap].max
       end
       result
     end
 
-    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: nil, fg_color: nil, &block)
+    def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, position: nil, bg_color: nil, fg_color: nil, &block)
       node_parent = self
 
       @children << node = Node.new(
@@ -93,6 +138,7 @@ module Panes
         padding: padding,
         border: border,
         direction: direction,
+        position: position,
         bg_color: bg_color || node_parent.bg_color,
         fg_color: fg_color || node_parent.fg_color,
       )
@@ -109,19 +155,21 @@ module Panes
         node.height += node.total_height_spacing
       end
 
-      if node_parent.fit_width?
-        if node_parent.left_right?
-          node_parent.width += node.min_width
-        else
-          node_parent.width = [node_parent.width, node.min_width].max
+      unless node.positioned?
+        if node_parent.fit_width?
+          if node_parent.left_right?
+            node_parent.width += node.min_width
+          else
+            node_parent.width = [node_parent.width, node.min_width].max
+          end
         end
-      end
 
-      if node_parent.fit_height?
-        if node_parent.left_right?
-          node_parent.height = [node_parent.height, node.min_height].max
-        else
-          node_parent.height += node.min_height
+        if node_parent.fit_height?
+          if node_parent.left_right?
+            node_parent.height = [node_parent.height, node.min_height].max
+          else
+            node_parent.height += node.min_height
+          end
         end
       end
 
