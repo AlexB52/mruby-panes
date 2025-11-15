@@ -10,13 +10,13 @@ module Panes
         fg_color = command[:fg_color]
 
         x0 = (bbox[:x]).to_i
-        x1 = (bbox[:x]+bbox[:width]).to_i
+        x1 = (bbox[:x]+bbox[:width]-1).to_i
         y0 = (bbox[:y]).to_i
-        y1 = (bbox[:y]+bbox[:height]).to_i
+        y1 = (bbox[:y]+bbox[:height]-1).to_i
 
         case command[:type]
         when :rectangle
-          (y0...y1).each { |y| tb.print(bbox[:x], y, fg_color, bg_color, ' ' * (x1-x0)) }
+          (y0..y1).each { |y| tb.print(bbox[:x], y, fg_color, bg_color, ' ' * (x1-x0+1)) }
 
         when :text
           tb.print(bbox[:x], bbox[:y], fg_color, bg_color, command[:text])
@@ -27,7 +27,7 @@ module Panes
           if top = border[:top]
             fg, bg = top[:fg_color], top[:bg_color]
 
-            tb.print(x0, y0, fg, bg, '-' * (x1-x0))
+            tb.print(x0, y0, fg, bg, '-' * (x1-x0+1))
             tb.set_cell(x0, y0, fg, bg, CORNER_CHAR)
             tb.set_cell(x1, y0, fg, bg, CORNER_CHAR)
           end
@@ -35,7 +35,7 @@ module Panes
           if right = border[:right]
             fg, bg = right[:fg_color], right[:bg_color]
 
-            (y0...y1).each { |y| tb.set_cell(x1, y, fg, bg, '|'.ord) }
+            (y0..y1).each { |y| tb.set_cell(x1, y, fg, bg, '|'.ord) }
             tb.set_cell(x1, y0, fg, bg, CORNER_CHAR)
             tb.set_cell(x1, y1, fg, bg, CORNER_CHAR)
           end
@@ -43,7 +43,7 @@ module Panes
           if bottom = border[:bottom]
             fg, bg = bottom[:fg_color], bottom[:bg_color]
 
-            tb.print(x0, y1, fg, bg, '-' * (x1-x0))
+            tb.print(x0, y1, fg, bg, '-' * (x1-x0+1))
             tb.set_cell(x0, y1, fg, bg, CORNER_CHAR)
             tb.set_cell(x1, y1, fg, bg, CORNER_CHAR)
           end
@@ -51,7 +51,7 @@ module Panes
           if left = border[:left]
             fg, bg = left[:fg_color], left[:bg_color]
 
-            (y0...y1).each { |y| tb.set_cell(x0, y, fg, bg, '|'.ord) }
+            (y0..y1).each { |y| tb.set_cell(x0, y, fg, bg, '|'.ord) }
             tb.set_cell(x0, y0, fg, bg, CORNER_CHAR)
             tb.set_cell(x0, y1, fg, bg, CORNER_CHAR)
           end

@@ -1,12 +1,12 @@
 Termbox2.init
 
-layout = Panes.init(width: Termbox2.width-1, height: Termbox2.height-1)
+layout = Panes.init(width: Termbox2.width, height: Termbox2.height)
 time = Time.now
 
 begin
   while true
-    layout.width = Termbox2.width-1
-    layout.height = Termbox2.height-1
+    layout.width = Termbox2.width
+    layout.height = Termbox2.height
 
     new_time = Time.now
     duration = new_time - time
