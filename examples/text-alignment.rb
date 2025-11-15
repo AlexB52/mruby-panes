@@ -2,6 +2,14 @@ Termbox2.init
 
 layout = Panes.init(width: Termbox2.width, height: Termbox2.height)
 
+lorem_ipsum =
+  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod" \
+  "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam," \
+  "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo" \
+  "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse" \
+  "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non" \
+  "proident, sunt in culpa qui officia deserunt mollit anim id est laborum." \
+
 begin
   loop do
     layout.width = Termbox2.width
@@ -9,13 +17,13 @@ begin
 
     commands = layout.build(id: 'root', width: Panes::Sizing.grow, height: Panes::Sizing.grow) do
       ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
-        text('Left aligned text stays flush with the container edge.', align: :left)
+        text(lorem_ipsum, align: :left)
       end
       ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
-        text('Centered text distributes space evenly and wraps within the box to stay centered.', align: :center)
+        text(lorem_ipsum, align: :center)
       end
       ui(width: Panes::Sizing.grow, height: 10, border: {all: [:default, :default]}) do
-        text('Right aligned text keeps the end of each line tight to the boundary.', align: :right)
+        text(lorem_ipsum, align: :right)
       end
     end
 
