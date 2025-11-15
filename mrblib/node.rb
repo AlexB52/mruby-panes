@@ -33,10 +33,10 @@ module Panes
       @child_gap = child_gap || 0
       @border = Borders.parse(**(border || {}))
       if border
-        @padding[:top] += 1
-        @padding[:right] += 1
-        @padding[:bottom] += 1
-        @padding[:left] += 1
+        @padding[:top]    += 1 if @border[:top]
+        @padding[:right]  += 1 if @border[:right]
+        @padding[:bottom] += 1 if @border[:bottom]
+        @padding[:left]   += 1 if @border[:left]
       end
 
       @w_sizing = Sizing.build(width)

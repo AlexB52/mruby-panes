@@ -29,16 +29,16 @@ begin
 
       ui(id: '2nd', width: Panes::Sizing.grow, height: Panes::Sizing.grow) do
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: { top: [:black, :cyan] }, bg_color: :blue) do
-          text("Hello, World!", fg_color: :blue)
+          text("Hello, World!", fg_color: :white)
         end
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: { right: [:black, :cyan] }, bg_color: :green) do
-          text("Hello, World!", fg_color: :blue)
+          text("Hello, World!", fg_color: :white)
         end
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: { bottom: [:black, :cyan] }, bg_color: :yellow) do
-          text("Hello, World!", fg_color: :blue)
+          text("Hello, World!", fg_color: :white)
         end
         ui(width: Panes::Sizing.grow, height: Panes::Sizing.grow, border: { left: [:black, :cyan] }, bg_color: :yellow) do
-          text("Hello, World!", fg_color: :blue)
+          text("Hello, World!", fg_color: :white)
         end
       end
 
