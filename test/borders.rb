@@ -2,20 +2,24 @@
 
 module Panes
   class TestBorders < MTest::Unit::TestCase
+    def test_nil
+      assert_nil Borders.parse(all: nil)
+    end
+
     def test_integers
       assert_equal({
         top:    { fg_color: 0, bg_color: 1 },
         left:   { fg_color: 0, bg_color: 1 },
         right:  { fg_color: 0, bg_color: 1 },
         bottom: { fg_color: 0, bg_color: 1 },
-      }, Borders.parse(0, 1))
+      }, Borders.parse(all: [0, 1]))
 
       assert_equal({
         top:    { fg_color: 5, bg_color: 2 },
         left:   { fg_color: 5, bg_color: 2 },
         right:  { fg_color: 5, bg_color: 2 },
         bottom: { fg_color: 5, bg_color: 2 },
-      }, Borders.parse(5, 2))
+      }, Borders.parse(all: [5, 2]))
     end
 
     def test_hashes
@@ -43,7 +47,7 @@ module Panes
         left:   { fg_color: 2, bg_color: 5 },
         right:  { fg_color: 2, bg_color: 5 },
         bottom: { fg_color: 2, bg_color: 5 },
-      }, Borders.parse(:red, :blue))
+      }, Borders.parse(all: [:red, :blue]))
 
       assert_equal({
         top:    { fg_color: 5, bg_color: 2 },
