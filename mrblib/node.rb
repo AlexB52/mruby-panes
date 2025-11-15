@@ -152,16 +152,8 @@ module Panes
         node.instance_eval(&block)
       end
 
-      boundaries = Calculations.text_size(node.content)
-      unless node.wrap
-        boundaries[:width][:min] = node.content.length
-      end
-
+      boundaries = Calculations.text_size(node.content, wrap: node.wrap, align: node.align)
       node.w_sizing = Sizing.grow(**boundaries[:width])
-      if node.align != :left
-        node.w_sizing[:max] = Float::INFINITY
-      end
-
       node.h_sizing = Sizing.grow(**boundaries[:height])
 
       if node_parent.inline_text?
