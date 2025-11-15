@@ -72,10 +72,14 @@ module Panes
     end
 
     def alignment_offset(width_available)
-      return 0 unless width_available && width_available > 0
-      return 0 if width_available.respond_to?(:finite?) && !width_available.finite?
+      return 0 unless width_available
+      return 0 if width_available <= 0
 
-      available = width_available.floor
+      available = width_available
+      if available.is_a?(Float) && !available.finite?
+        available = 0
+      end
+      available = available.floor
 
       case align
       when :right
@@ -342,17 +346,8 @@ module Panes
     ALIGNMENTS = [:left, :center, :right].freeze
 
     def normalize_align(value)
-      sym =
-        case value
-        when String then value.to_sym
-        when Symbol then value
-        else
-          :left
-        end
-
-      return sym if ALIGNMENTS.include?(sym)
-
-      :left
+      sym = value.is_a?(String) ? value.to_sym : value
+      ALIGNMENTS.include?(sym) ? sym : :left
     end
   end
 end
