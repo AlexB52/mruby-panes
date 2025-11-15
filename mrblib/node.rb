@@ -4,7 +4,7 @@ module Panes
     include DirectionHelpers
 
     attr_accessor :id, :parent, :children
-    attr_accessor :type, :content, :wrap
+    attr_accessor :type, :content, :wrap, :align
     attr_accessor :border
     attr_accessor :w_sizing, :h_sizing, :padding, :child_gap
     attr_accessor :x, :y, :width, :height
@@ -16,6 +16,7 @@ module Panes
       width: nil, height: nil,
       padding: [0], child_gap: 0,
       type: :rectangle, content: '', wrap: true, border: nil,
+      align: :left,
       direction: :left_right,
       bg_color: 0, fg_color: 0)
 
@@ -25,6 +26,7 @@ module Panes
       @content = content
       @wrap = wrap
       @type = type
+      @align = normalize_align(align)
       @direction = direction
       @bg_color = Colors.parse(bg_color)
       @fg_color = Colors.parse(fg_color)
@@ -63,6 +65,31 @@ module Panes
 
       @parent = node
       node.children << self
+    end
+
+    def align=(value)
+      @align = normalize_align(value)
+    end
+
+    def alignment_offset(width_available)
+      return 0 unless width_available
+      return 0 if width_available <= 0
+
+      available =
+        if width_available.respond_to?(:finite?) && !width_available.finite?
+          0
+        else
+          width_available.floor
+        end
+
+      case align
+      when :right
+        available
+      when :center
+        available / 2
+      else
+        0
+      end
     end
 
     def total_width_spacing
@@ -128,7 +155,7 @@ module Panes
       node
     end
 
-    def text(content = '', id: nil, wrap: true, bg_color: nil, fg_color: nil, &block)
+    def text(content = '', id: nil, wrap: true, align: :left, bg_color: nil, fg_color: nil, &block)
       node_parent = self
 
       @children << node = Node.new(
@@ -137,6 +164,7 @@ module Panes
         type: :text,
         content: content,
         wrap: wrap,
+        align: align,
         width: Sizing.grow,
         height: Sizing.grow,
         bg_color: bg_color || node_parent.bg_color,
@@ -151,6 +179,9 @@ module Panes
       boundaries = Calculations.text_size(node.content)
       unless node.wrap
         boundaries[:width][:min] = node.content.length
+      end
+      if node.align != :left
+        boundaries[:width][:max] = Float::INFINITY
       end
       node.w_sizing = Sizing.grow(**boundaries[:width])
       node.h_sizing = Sizing.grow(**boundaries[:height])
@@ -260,7 +291,9 @@ module Panes
         end
 
         Text.wrap(content, width: width).each do |line|
-          cmd = new_cmd.call(x, y_offset, child.bg_color, child.fg_color)
+          offset = alignment_offset(width - line.length)
+          start_x = x + offset
+          cmd = new_cmd.call(start_x, y_offset, child.bg_color, child.fg_color)
 
           if line.empty?
             result << cmd
@@ -296,16 +329,35 @@ module Panes
         result
       when :text
         Text.wrap(content, width: width).map.with_index do |line, i|
+          offset = alignment_offset(width - line.length)
           {
             id: id,
             type: :text,
             text: line,
-            bounding_box: { x: x, y: y + i, width: line.length, height: 1 },
+            bounding_box: { x: x + offset, y: y + i, width: line.length, height: 1 },
             bg_color: bg_color,
             fg_color: fg_color,
           }
         end
       end
+    end
+
+    private
+
+    ALIGNMENTS = [:left, :center, :right].freeze
+
+    def normalize_align(value)
+      sym =
+        case value
+        when String then value.to_sym
+        when Symbol then value
+        else
+          :left
+        end
+
+      return sym if ALIGNMENTS.include?(sym)
+
+      :left
     end
   end
 end
