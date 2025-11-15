@@ -10,6 +10,7 @@ module Panes
     attr_accessor :x, :y, :width, :height
     attr_accessor :direction
     attr_accessor :bg_color, :fg_color
+    attr_accessor :grid_layout, :grid_areas, :grid_position, :grid_state
 
     def initialize(
       id: nil, parent: nil, children: [],
@@ -39,6 +40,11 @@ module Panes
         @padding[:left]   += 1 if @border[:left]
       end
 
+      @grid_layout = nil
+      @grid_areas = []
+      @grid_position = nil
+      @grid_state = {}
+
       @w_sizing = Sizing.build(width)
       if fixed_width?
         @width = min_width
@@ -56,6 +62,10 @@ module Panes
 
     def inline_text?
       type == :inline_text
+    end
+
+    def grid_layout?
+      !!grid_layout
     end
 
     def parent=(node)
@@ -79,6 +89,26 @@ module Panes
         result += [0, (children.length-1) * child_gap].max
       end
       result
+    end
+
+    def grid(columns:, rows:, gap: 0, **_grid_options, &block)
+      unless block_given?
+        raise ArgumentError, 'grid requires a block'
+      end
+
+      if grid_layout?
+        label = id ? id.inspect : '(anonymous)'
+        raise ArgumentError, "Grid already defined for #{label}"
+      end
+
+      @grid_layout = GridLayout.new(columns: columns, rows: rows, gap: gap)
+      @grid_areas = []
+      @grid_state = {}
+
+      builder = GridLayout::Builder.new(self, grid_layout)
+      builder.instance_eval(&block)
+
+      self
     end
 
     def ui(id: nil, width: nil, height: nil, padding: [0], child_gap: 0, border: nil, direction: :left_right, bg_color: nil, fg_color: nil, &block)
@@ -109,19 +139,21 @@ module Panes
         node.height += node.total_height_spacing
       end
 
-      if node_parent.fit_width?
-        if node_parent.left_right?
-          node_parent.width += node.min_width
-        else
-          node_parent.width = [node_parent.width, node.min_width].max
+      unless node_parent.grid_layout?
+        if node_parent.fit_width?
+          if node_parent.left_right?
+            node_parent.width += node.min_width
+          else
+            node_parent.width = [node_parent.width, node.min_width].max
+          end
         end
-      end
 
-      if node_parent.fit_height?
-        if node_parent.left_right?
-          node_parent.height = [node_parent.height, node.min_height].max
-        else
-          node_parent.height += node.min_height
+        if node_parent.fit_height?
+          if node_parent.left_right?
+            node_parent.height = [node_parent.height, node.min_height].max
+          else
+            node_parent.height += node.min_height
+          end
         end
       end
 
@@ -164,8 +196,10 @@ module Panes
         node.width += node.total_width_spacing
       end
 
-      if node_parent.fit_width?
-        node_parent.width += node.min_width
+      unless node_parent.grid_layout?
+        if node_parent.fit_width?
+          node_parent.width += node.min_width
+        end
       end
 
       # Fit Height Adjustment - (unused)
@@ -173,8 +207,10 @@ module Panes
         node.height += node.total_height_spacing
       end
 
-      if node_parent.fit_height?
-        node_parent.height = [node_parent.height, node.min_height].max
+      unless node_parent.grid_layout?
+        if node_parent.fit_height?
+          node_parent.height = [node_parent.height, node.min_height].max
+        end
       end
 
       node
