@@ -9,6 +9,7 @@ module Panes
     attr_accessor :w_sizing, :h_sizing, :padding, :child_gap
     attr_accessor :x, :y, :width, :height
     attr_accessor :direction
+    attr_accessor :align
     attr_accessor :bg_color, :fg_color
 
     def initialize(
@@ -16,6 +17,7 @@ module Panes
       width: nil, height: nil,
       padding: [0], child_gap: 0,
       type: :rectangle, content: '', wrap: true, border: nil,
+      align: :left,
       direction: :left_right,
       bg_color: 0, fg_color: 0)
 
@@ -26,6 +28,7 @@ module Panes
       @wrap = wrap
       @type = type
       @direction = direction
+      @align = align || :left
       @bg_color = Colors.parse(bg_color)
       @fg_color = Colors.parse(fg_color)
       @x = @y = @height = @width = 0
@@ -128,7 +131,7 @@ module Panes
       node
     end
 
-    def text(content = '', id: nil, wrap: true, bg_color: nil, fg_color: nil, &block)
+    def text(content = '', id: nil, wrap: true, align: :left, bg_color: nil, fg_color: nil, &block)
       node_parent = self
 
       @children << node = Node.new(
@@ -137,6 +140,7 @@ module Panes
         type: :text,
         content: content,
         wrap: wrap,
+        align: align,
         width: Sizing.grow,
         height: Sizing.grow,
         bg_color: bg_color || node_parent.bg_color,
@@ -148,11 +152,16 @@ module Panes
         node.instance_eval(&block)
       end
 
+      node.align = align || :left
+
       boundaries = Calculations.text_size(node.content)
       unless node.wrap
         boundaries[:width][:min] = node.content.length
       end
       node.w_sizing = Sizing.grow(**boundaries[:width])
+      if node.align != :left
+        node.w_sizing[:max] = Float::INFINITY
+      end
       node.h_sizing = Sizing.grow(**boundaries[:height])
 
       if node_parent.inline_text?
@@ -207,6 +216,24 @@ module Panes
       }
     end
 
+    def text_alignment_offset(line_length)
+      return 0 unless align
+
+      available = width - line_length
+      if available <= 0
+        return 0
+      end
+
+      case align
+      when :right
+        available
+      when :center
+        available / 2.0
+      else
+        0
+      end
+    end
+
     def to_commands
       case type
       when :rectangle
@@ -254,7 +281,8 @@ module Panes
         end
 
         Text.wrap(content, width: width).each do |line|
-          cmd = new_cmd.call(x, y_offset, child.bg_color, child.fg_color)
+          offset_x = x + text_alignment_offset(line.length)
+          cmd = new_cmd.call(offset_x, y_offset, child.bg_color, child.fg_color)
 
           if line.empty?
             result << cmd
@@ -290,11 +318,12 @@ module Panes
         result
       when :text
         Text.wrap(content, width: width).map.with_index do |line, i|
+          offset_x = x + text_alignment_offset(line.length)
           {
             id: id,
             type: :text,
             text: line,
-            bounding_box: { x: x, y: y + i, width: line.length, height: 1 },
+            bounding_box: { x: offset_x, y: y + i, width: line.length, height: 1 },
             bg_color: bg_color,
             fg_color: fg_color,
           }
