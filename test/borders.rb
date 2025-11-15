@@ -4,6 +4,7 @@ module Panes
   class TestBorders < MTest::Unit::TestCase
     def test_nil
       assert_nil Borders.parse(all: nil)
+      assert_nil Borders.parse(**{})
     end
 
     def test_integers
