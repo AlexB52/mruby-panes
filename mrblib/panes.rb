@@ -40,10 +40,10 @@ module Panes
             }
           end
 
-          distribution = Calculations
+          Calculations
             .water_fill_distribution(current_sizes, extra_width)
-            .each_with_index do |size, i|
-              growables[i].width += size
+            .each_with_index do |extra, i|
+              growables[i].width += extra
             end
         end
       else
@@ -103,10 +103,10 @@ module Panes
             }
           end
 
-          distribution = Calculations
+          Calculations
             .water_fill_distribution(current_sizes, extra_height)
-            .each_with_index do |size, i|
-              growables[i].height += size
+            .each_with_index do |extra, i|
+              growables[i].height += extra
             end
         end
       end
