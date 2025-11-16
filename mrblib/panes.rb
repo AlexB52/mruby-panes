@@ -40,10 +40,11 @@ module Panes
             }
           end
 
-          distribution = Calculations.water_fill_distribution(current_sizes, extra_width)
-          discretize_distribution(distribution).each_with_index do |size, i|
-            growables[i].width += size
-          end
+          distribution = Calculations
+            .water_fill_distribution(current_sizes, extra_width)
+            .each_with_index do |size, i|
+              growables[i].width += size
+            end
         end
       else
         if growables.any?
@@ -102,50 +103,17 @@ module Panes
             }
           end
 
-          distribution = Calculations.water_fill_distribution(current_sizes, extra_height)
-          discretize_distribution(distribution).each_with_index do |size, i|
-            growables[i].height += size
-          end
+          distribution = Calculations
+            .water_fill_distribution(current_sizes, extra_height)
+            .each_with_index do |size, i|
+              growables[i].height += size
+            end
         end
       end
 
       node.children.each do |child|
         grow_height_containers(child)
       end
-    end
-
-    def discretize_distribution(values)
-      return values if values.empty?
-
-      floored = values.map { |value| value.floor }
-      target_total = values.reduce(0.0) { |sum, value| sum + value }.round
-      remainder = target_total - floored.sum
-
-      return floored if remainder <= 0
-
-      fractional = values.each_with_index.map do |value, index|
-        [value - value.floor, index]
-      end
-      fractional.sort_by! { |fraction, index| [-fraction, index] }
-
-      fractional.each do |fraction, index|
-        break if remainder.zero?
-        next if fraction <= 0
-
-        floored[index] += 1
-        remainder -= 1
-      end
-
-      if remainder > 0
-        floored.each_index do |index|
-          break if remainder.zero?
-
-          floored[index] += 1
-          remainder -= 1
-        end
-      end
-
-      floored
     end
 
     def set_positions(node, offset_x = 0, offset_y = 0)

@@ -7,11 +7,11 @@ module Panes
         case lv
         when Numeric
           min_amount += 0
-          { idx: idx, cur: lv.to_f, min: 0, max: Float::INFINITY }
+          { idx: idx, cur: lv, min: 0, max: Float::INFINITY }
         when Hash
-          cur = (lv[:current] || 0).to_f
-          min = (lv[:min] || 0).to_f
-          max = (lv[:max] ||  Float::INFINITY).to_f
+          cur = lv[:current] || 0
+          min = lv[:min] || 0
+          max = lv[:max] ||  Float::INFINITY
 
           min_amount += [0, min - cur].max
           { idx: idx, cur: cur, min: min, max: max }
@@ -30,7 +30,7 @@ module Panes
 
       # sort by current level
       order = items.sort_by { |it| it[:cur] }
-      extra = extra.to_f
+      extra = extra
       i = 0
       eps = 1e-9 # epsilon to avoid float ping-pong
 
@@ -60,8 +60,8 @@ module Panes
 
           i += 1 if target == neighbor
         else
-          delta = extra / group.length
-          group.each { |it| it[:cur] += delta }
+          delta, rest = extra.divmod(group.length)
+          group.each.with_index(1) { |it, i| it[:cur] += (i <= rest ? delta + 1 : delta) }
           extra = 0.0
         end
       end

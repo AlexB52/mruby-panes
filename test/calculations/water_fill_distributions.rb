@@ -56,6 +56,14 @@ module Panes
         { current: 0, min: 0, max: nil },
       ], 250)
     end
+
+    def test_discretizes_fractional_values
+      assert_equal [16, 15, 15], Calculations.water_fill_distribution([
+        { current: 0, min: 15, max: nil },
+        { current: 0, min: 15, max: nil },
+        { current: 0, min: 15, max: nil },
+      ], 46)
+    end
   end
 end
 
