@@ -70,7 +70,7 @@ module Panes
       items.sort_by { |it| it[:idx] }.map { |it| it[:cur] }
     end
 
-    def self.text_size(text)
+    def self.text_size(text, wrap: true, align: :left)
       lines = text.split("\n")
       if lines.empty?
         lines = [""]
@@ -79,7 +79,15 @@ module Panes
       words = text.split
 
       w_max = lines.map(&:length).max || 0
+      if align != :left
+        w_max = Float::INFINITY
+      end
+
       w_min = words.map(&:length).max || 0
+      unless wrap
+        w_min = w_max
+      end
+
       h_min = lines.length
 
       h_max = 0

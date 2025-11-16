@@ -9,6 +9,7 @@ module Panes
     attr_accessor :w_sizing, :h_sizing, :padding, :child_gap
     attr_accessor :x, :y, :width, :height
     attr_accessor :direction
+    attr_accessor :align
     attr_accessor :bg_color, :fg_color
 
     def initialize(
@@ -16,6 +17,7 @@ module Panes
       width: nil, height: nil,
       padding: [0], child_gap: 0,
       type: :rectangle, content: '', wrap: true, border: nil,
+      align: :left,
       direction: :left_right,
       bg_color: 0, fg_color: 0)
 
@@ -26,6 +28,7 @@ module Panes
       @wrap = wrap
       @type = type
       @direction = direction
+      @align = align || :left
       @bg_color = Colors.parse(bg_color)
       @fg_color = Colors.parse(fg_color)
       @x = @y = @height = @width = 0
@@ -128,7 +131,7 @@ module Panes
       node
     end
 
-    def text(content = '', id: nil, wrap: true, bg_color: nil, fg_color: nil, &block)
+    def text(content = '', id: nil, wrap: true, align: :left, bg_color: nil, fg_color: nil, &block)
       node_parent = self
 
       @children << node = Node.new(
@@ -137,6 +140,7 @@ module Panes
         type: :text,
         content: content,
         wrap: wrap,
+        align: align,
         width: Sizing.grow,
         height: Sizing.grow,
         bg_color: bg_color || node_parent.bg_color,
@@ -148,10 +152,7 @@ module Panes
         node.instance_eval(&block)
       end
 
-      boundaries = Calculations.text_size(node.content)
-      unless node.wrap
-        boundaries[:width][:min] = node.content.length
-      end
+      boundaries = Calculations.text_size(node.content, wrap: node.wrap, align: node.align)
       node.w_sizing = Sizing.grow(**boundaries[:width])
       node.h_sizing = Sizing.grow(**boundaries[:height])
 
@@ -253,7 +254,7 @@ module Panes
           }
         end
 
-        Text.wrap(content, width: width).each do |line|
+        Text.wrap(content, width: width, align: align).each do |line|
           cmd = new_cmd.call(x, y_offset, child.bg_color, child.fg_color)
 
           if line.empty?
@@ -262,7 +263,17 @@ module Panes
             next
           end
 
-          line_pos = 0
+          indent = 0
+          while indent < line.length && line[indent] == " "
+            indent += 1
+          end
+
+          if indent > 0
+            cmd[:text] << " " * indent
+            cmd[:bounding_box][:width] += indent
+          end
+          line_pos = indent
+
           while line_pos < line.length
             if child_pos >= child_content.length # get a new child
               result << cmd
@@ -289,7 +300,7 @@ module Panes
 
         result
       when :text
-        Text.wrap(content, width: width).map.with_index do |line, i|
+        Text.wrap(content, width: width, align: align).map.with_index do |line, i|
           {
             id: id,
             type: :text,
