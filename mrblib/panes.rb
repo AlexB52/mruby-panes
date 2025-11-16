@@ -27,7 +27,8 @@ module Panes
     alias :build :ui
 
     def grow_width_containers(node)
-      growables, sized = node.children.partition(&:grown_width?)
+      flow_children = node.flow_children
+      growables, sized = flow_children.partition(&:grown_width?)
 
       if node.left_right?
         if growables.any?
@@ -55,7 +56,7 @@ module Panes
         end
 
         parent = node.parent
-        if parent&.fit_width?
+        if parent&.fit_width? && !node.positioned?
           parent.width = [parent.width, node.width].max
         end
       end
@@ -78,7 +79,8 @@ module Panes
     end
 
     def grow_height_containers(node)
-      growables, sized = node.children.reject(&:text?).partition(&:grown_height?)
+      flow_children = node.flow_children.reject(&:text?)
+      growables, sized = flow_children.partition(&:grown_height?)
 
       if node.left_right?
         if growables.any?
@@ -89,7 +91,7 @@ module Panes
         end
 
         parent = node.parent
-        if parent&.fit_height?
+        if parent&.fit_height? && !node.positioned?
           parent.height = [parent.height, node.height].max
         end
       else
@@ -120,19 +122,52 @@ module Panes
       node.x = offset_x
       node.y = offset_y
 
-      node.children.each do |child|
-        set_positions(
-          child,
-          offset_x + node.padding[:left],
-          offset_y + node.padding[:top]
-        )
+      content_x = offset_x + node.padding[:left]
+      content_y = offset_y + node.padding[:top]
+      flow_x = content_x
+      flow_y = content_y
 
-        if node.left_right?
-          offset_x += child.width + node.child_gap
+      node.children.each do |child|
+        if child.positioned?
+          child_x, child_y = relative_coordinates(node, child)
+          set_positions(child, child_x, child_y)
         else
-          offset_y += child.height + node.child_gap
+          set_positions(child, flow_x, flow_y)
+
+          if node.left_right?
+            flow_x += child.width + node.child_gap
+          else
+            flow_y += child.height + node.child_gap
+          end
         end
       end
+    end
+
+    def relative_coordinates(parent, child)
+      content_x = parent.x + parent.padding[:left]
+      content_y = parent.y + parent.padding[:top]
+      interior_width = parent.width - parent.padding[:left] - parent.padding[:right]
+      interior_height = parent.height - parent.padding[:top] - parent.padding[:bottom]
+
+      child_x = case child.position_horizontal
+                when :left
+                  content_x
+                when :center
+                  content_x + (interior_width - child.width) / 2
+                when :right
+                  content_x + interior_width - child.width
+                end
+
+      child_y = case child.position_vertical
+                when :top
+                  content_y
+                when :middle
+                  content_y + (interior_height - child.height) / 2
+                when :bottom
+                  content_y + interior_height - child.height
+                end
+
+      [child_x, child_y]
     end
 
     def build_commands(node, out: [])
