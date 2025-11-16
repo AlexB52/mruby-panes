@@ -12,6 +12,10 @@ module Panes
       w_sizing[:type]
     end
 
+    def width_percent
+      w_sizing[:percent]
+    end
+
     def max_height
       h_sizing[:max]
     end
@@ -22,6 +26,10 @@ module Panes
 
     def height_type
       h_sizing[:type]
+    end
+
+    def height_percent
+      h_sizing[:percent]
     end
 
     def grown_width?
@@ -36,6 +44,14 @@ module Panes
       width_type == :fit
     end
 
+    def percent_width?
+      width_type == :percent
+    end
+
+    def grown_height?
+      height_type == :grow
+    end
+
     def fixed_height?
       height_type == :fixed
     end
@@ -44,8 +60,8 @@ module Panes
       height_type == :fit
     end
 
-    def grown_height?
-      height_type == :grow
+    def percent_height?
+      height_type == :percent
     end
   end
 end

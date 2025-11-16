@@ -27,11 +27,17 @@ module Panes
     alias :build :ui
 
     def grow_width_containers(node)
-      growables, sized = node.children.partition(&:grown_width?)
+      percents = node.children.select(&:percent_width?)
+      available_width = [0, node.width - node.total_width_spacing].max
+      percents.each do |child|
+        child.width = available_width * (child.width_percent || 0)
+      end
+
+      growables, others = node.children.partition(&:grown_width?)
 
       if node.left_right?
         if growables.any?
-          extra_width = [0, node.width - node.total_width_spacing - sized.sum(&:width)].max
+          extra_width = [0, node.width - node.total_width_spacing - others.sum(&:width)].max
           current_sizes = growables.map do |node|
             {
               current: node.width,
@@ -78,7 +84,13 @@ module Panes
     end
 
     def grow_height_containers(node)
-      growables, sized = node.children.reject(&:text?).partition(&:grown_height?)
+      percents = node.children.select(&:percent_height?)
+      available_height = [0, node.height - node.total_height_spacing].max
+      percents.each do |child|
+        child.height = available_height * (child.height_percent || 0)
+      end
+
+      growables, others = node.children.reject(&:text?).partition(&:grown_height?)
 
       if node.left_right?
         if growables.any?
@@ -94,7 +106,7 @@ module Panes
         end
       else
         if growables.any?
-          extra_height = [0, node.height - node.total_height_spacing - sized.sum(&:height)].max
+          extra_height = [0, node.height - node.total_height_spacing - others.sum(&:height)].max
           current_sizes = growables.map do |node|
             {
               current: node.height,
