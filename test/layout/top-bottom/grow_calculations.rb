@@ -106,6 +106,47 @@ class TestWidthGrow < MTest::Unit::TestCase
       }
     ], commands)
   end
+
+  def test_grow_heights_with_remainder_pixels
+    layout = Panes.init(width: 30, height: 46)
+
+    commands = layout.build(id: 'root', height: Panes::Sizing.grow, width: 30, direction: :top_bottom) do
+      ui(id: 'one', height: Panes::Sizing.grow(min: 15), width: 30)
+      ui(id: 'two', height: Panes::Sizing.grow(min: 15), width: 30)
+      ui(id: 'three', height: Panes::Sizing.grow(min: 15), width: 30)
+    end
+
+    assert_commands([
+      {
+        id: 'root',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 30, height: 46 },
+        bg_color: 0,
+        fg_color: 0,
+      },
+      {
+        id: 'one',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 0, width: 30, height: 16 },
+        bg_color: 0,
+        fg_color: 0,
+      },
+      {
+        id: 'two',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 16, width: 30, height: 15 },
+        bg_color: 0,
+        fg_color: 0,
+      },
+      {
+        id: 'three',
+        type: :rectangle,
+        bounding_box: { x: 0, y: 31, width: 30, height: 15 },
+        bg_color: 0,
+        fg_color: 0,
+      }
+    ], commands)
+  end
 end
 
 class TestWidthGrow < MTest::Unit::TestCase
@@ -259,35 +300,35 @@ class TestMixedGrow < MTest::Unit::TestCase
       {
         id: 'one',
         type: :rectangle,
-        bounding_box: { x: 5, y: 5, width: 20, height: 42.5 },
+        bounding_box: { x: 5, y: 5, width: 20, height: 43 },
         bg_color: 0,
         fg_color: 0,
       },
       {
         id: 'two',
         type: :rectangle,
-        bounding_box: { x: 5, y: 5, width: 20, height: 42.5 },
+        bounding_box: { x: 5, y: 5, width: 20, height: 43 },
         bg_color: 0,
         fg_color: 0,
       },
       {
         id: 'three',
         type: :rectangle,
-        bounding_box: { x: 5, y: 52.5, width: 30, height: 42.5 },
+        bounding_box: { x: 5, y: 53, width: 30, height: 42 },
         bg_color: 0,
         fg_color: 0,
       },
       {
         id: 'four',
         type: :rectangle,
-        bounding_box: { x: 5, y: 52.5, width: 30, height: 21.25 },
+        bounding_box: { x: 5, y: 53, width: 30, height: 21 },
         bg_color: 0,
         fg_color: 0,
       },
       {
         id: 'five',
         type: :rectangle,
-        bounding_box: { x: 5, y: 73.75, width: 30, height: 21.25 },
+        bounding_box: { x: 5, y: 74, width: 30, height: 21 },
         bg_color: 0,
         fg_color: 0,
       }
