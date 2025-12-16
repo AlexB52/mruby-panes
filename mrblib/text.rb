@@ -50,6 +50,7 @@ module Panes
       buffer = { fg_color: nil, bg_color: nil, x: 0, y: 0, width: width}
       x = 0
       y = 0
+
       inputs.each do |input|
         buffer[:fg_color] = input[:fg_color]
         buffer[:bg_color] = input[:bg_color]
@@ -60,7 +61,8 @@ module Panes
           buffer[:width] = width - buffer[:x]
 
           if text[buffer[:width]] == nil
-            line = text
+
+            line = text.strip
             if input[:text].end_with?("\s")
               line += "\s"
             end
@@ -82,8 +84,12 @@ module Panes
 
           else
             x = buffer[:width]
-            x-= 1 until text[x] == "\s"
-            line = text.byteslice(0, x).strip
+            x-= 1 until text[x] == "\s" || x == 0
+            if x == 0
+              line = text[buffer[:width]]
+            else
+              line = text.byteslice(0, x).strip
+            end
 
             out << Command.new(line, buffer[:x], buffer[:y], buffer[:bg_color], buffer[:fg_color])
 

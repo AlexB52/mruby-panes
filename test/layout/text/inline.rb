@@ -37,6 +37,7 @@ class TestInlineText < MTest::Unit::TestCase
   end
 
   def test_wrapped_text_with_overlap
+
     layout = Panes.init(width: 100, height: 100)
 
     commands = layout.build(id: 'root', width: Panes::Sizing.grow(max: 51)) do
@@ -88,8 +89,8 @@ class TestInlineText < MTest::Unit::TestCase
       {
         id: 'text',
         type: :text,
-        text: "dolore magna aliqua. Ut enim ad minim veniam,",
-        bounding_box: { x: 0, y: 2, width: 45, height: 1 },
+        text: "dolore magna aliqua. Ut enim ad minim veniam,      ",
+        bounding_box: { x: 0, y: 2, width: 51, height: 1 },
         bg_color: 0,
         fg_color: 0,
       },
