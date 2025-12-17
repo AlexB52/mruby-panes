@@ -37,7 +37,6 @@ class TestInlineText < MTest::Unit::TestCase
   end
 
   def test_wrapped_text_with_overlap
-
     layout = Panes.init(width: 100, height: 100)
 
     commands = layout.build(id: 'root', width: Panes::Sizing.grow(max: 51)) do

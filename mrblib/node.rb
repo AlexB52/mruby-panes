@@ -242,7 +242,7 @@ module Panes
           }
         end
 
-        Text.format2(inlines, width: width, align: align).map do |cmd|
+        Text.inline(inlines, width: width, align: align).map do |cmd|
           {
             id: id,
             type: :text,

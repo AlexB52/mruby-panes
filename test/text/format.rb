@@ -66,7 +66,7 @@ module Panes
         { text: 'veniam,                       ', x: 0,  y: 5, bg_color: 4, fg_color: 3 },
       ]
 
-      assert_commands(expected, Text.format2(inputs, width: 30, align: :left, wrap: true))
+      assert_commands(expected, Text.inline(inputs, width: 30, align: :left, wrap: true))
     end
 
     def test_wrap_right
@@ -93,7 +93,7 @@ module Panes
         { text: '                       veniam,', x: 0,  y: 5, bg_color: 4, fg_color: 3 },
       ]
 
-      assert_commands(expected, Text.format2(inputs, width: 30, align: :right, wrap: true))
+      assert_commands(expected, Text.inline(inputs, width: 30, align: :right, wrap: true))
     end
 
     def test_wrap_center
@@ -120,7 +120,7 @@ module Panes
         { text: '           veniam,            ', x: 0,  y: 5, bg_color: 4, fg_color: 3 },
       ]
 
-      assert_commands(expected, Text.format2(inputs, width: 30, align: :center, wrap: true))
+      assert_commands(expected, Text.inline(inputs, width: 30, align: :center, wrap: true))
     end
 
     def test_wrap_with_space_between_inlines
@@ -147,7 +147,7 @@ module Panes
         { text: '           veniam,            ', x: 0,  y: 5, bg_color: 4, fg_color: 3 },
       ]
 
-      assert_commands(expected, Text.format2(inputs, width: 30, align: :center, wrap: true))
+      assert_commands(expected, Text.inline(inputs, width: 30, align: :center, wrap: true))
     end
   end
 end

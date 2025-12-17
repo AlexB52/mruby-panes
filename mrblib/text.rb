@@ -34,7 +34,7 @@ module Panes
       end
     end
 
-    def self.format2(inputs, width: nil, align: :left, wrap: false)
+    def self.inline(inputs, width: nil, align: :left, wrap: false)
       width ||= inputs.map { |input| input[:text].length }.max
 
       out = []
