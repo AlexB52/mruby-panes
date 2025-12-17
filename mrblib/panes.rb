@@ -17,6 +17,7 @@ module Panes
 
       grow_width_containers(@tree)
       wrap_text(@tree)
+      ensure_min_heights(@tree)
       grow_height_containers(@tree)
       set_positions(@tree)
 
@@ -74,12 +75,46 @@ module Panes
     def wrap_text(node)
       if node.text?
         lines = Text.wrap(node.content, width: node.width)
-        node.height = lines.count
-        return
+        text_height = lines.count
+        node.height = text_height
+
+        if node.fit_height? || node.grown_height?
+          min_height = [text_height, node.min_height || 0].max
+          node.h_sizing[:min] = min_height
+        end
+
+        return text_height
       end
 
       node.children.each do |child|
         wrap_text(child)
+      end
+    end
+
+    def ensure_min_heights(node)
+      return node.height if node.text?
+
+      child_requirements = node.children.map { |child| ensure_min_heights(child) }
+
+      content_height = if node.top_bottom?
+        child_requirements.sum
+      else
+        child_requirements.max || 0
+      end
+
+      spacing = node.padding[:top] + node.padding[:bottom]
+      if node.top_bottom? && node.children.length > 1
+        spacing += [0, node.children.length - 1].max * (node.child_gap || 0)
+      end
+
+      content_height += spacing
+
+      if node.fit_height? || node.grown_height?
+        min_height = [content_height, node.min_height].max
+        node.h_sizing[:min] = min_height
+        min_height
+      else
+        node.min_height || 0
       end
     end
 
