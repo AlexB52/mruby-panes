@@ -234,71 +234,30 @@ module Panes
 
         result
       when :inline_text
-        result   = []
-        y_offset = y
-
-        child_enum    = children.each
-
-        child         = child_enum.next
-        child_content = child&.content.to_s
-        child_pos     = 0
-
-        new_cmd = ->(x0, y0, bg_color = 0, fg_color = 0) do
+        inlines = children.map do |child|
           {
-            id: id,
-            type: :text,
-            text: "",
-            bounding_box: { x: x0, y: y0, width: 0, height: 1 },
-            bg_color: bg_color,
-            fg_color: fg_color,
+            text: child.content,
+            fg_color: child.fg_color,
+            bg_color: child.bg_color
           }
         end
 
-        Text.wrap(content, width: width, align: align).each do |line|
-          cmd = new_cmd.call(x, y_offset, child.bg_color, child.fg_color)
-
-          if line.empty?
-            result << cmd
-            y_offset += 1
-            next
-          end
-
-          indent = 0
-          while indent < line.length && line[indent] == " "
-            indent += 1
-          end
-
-          if indent > 0
-            cmd[:text] << " " * indent
-            cmd[:bounding_box][:width] += indent
-          end
-          line_pos = indent
-
-          while line_pos < line.length
-            if child_pos >= child_content.length # get a new child
-              result << cmd
-
-              child         = child_enum.next
-              child_content = child&.content.to_s
-              child_pos     = 0
-              cmd = new_cmd.call(cmd[:bounding_box][:x] + cmd[:bounding_box][:width], y_offset, child.bg_color, child.fg_color)
-            end
-
-            take = [line.length - line_pos, child_content.length - child_pos].min
-
-            segment = child_content.byteslice(child_pos, take)
-            cmd[:text] << segment
-            cmd[:bounding_box][:width] += take
-
-            line_pos  += take
-            child_pos += take + 1
-          end
-
-          result << cmd
-          y_offset += 1
+        Text.inline(inlines, width: width, align: align).map do |cmd|
+          {
+            id: id,
+            type: :text,
+            text: cmd[:text],
+            bounding_box: {
+              x: x + cmd[:x],
+              y: y + cmd[:y],
+              width: cmd[:text].length,
+              height: 1
+            },
+            bg_color: cmd[:bg_color],
+            fg_color: cmd[:fg_color],
+          }
         end
 
-        result
       when :text
         Text.wrap(content, width: width, align: align).map.with_index do |line, i|
           {
