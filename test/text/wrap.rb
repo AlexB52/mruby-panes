@@ -3,11 +3,11 @@ module Panes
     def test_one_sentence
       content = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
       assert_equal([
-        "Lorem ipsum dolor sit amet,",
-        "consectetur adipisicing elit,",
-        "sed do eiusmod tempor",
+        "Lorem ipsum dolor sit amet,   ",
+        "consectetur adipisicing elit, ",
+        "sed do eiusmod tempor         ",
         "incididunt ut labore et dolore",
-        "magna aliqua.",
+        "magna aliqua.                 ",
       ], Text.wrap(content, width: 30))
     end
 
@@ -18,8 +18,8 @@ module Panes
       TEXT
 
       assert_equal([
-        "Lorem ipsum dolor sit amet, consectetur adipisicing",
-        "elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Lorem ipsum dolor sit amet, consectetur adipisicing                             ",
+        "elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.        ",
       ], Text.wrap(content, width: 80))
     end
 
@@ -32,10 +32,10 @@ module Panes
       TEXT
 
       assert_equal([
-        "Lorem ipsum dolor sit amet, consectetur adipisicing",
+        "Lorem ipsum dolor sit amet, consectetur adipisicing                             ",
         "",
         "",
-        "elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.        ",
       ], Text.wrap(content, width: 80))
     end
 
@@ -47,10 +47,10 @@ module Panes
 
       assert_equal([
         "Lorem ipsum dolor sit amet,",
-        "consectetur adipisicing",
+        "consectetur adipisicing    ",
         "elit, sed do eiusmod tempor",
-        "incididunt ut labore et",
-        "dolore magna aliqua.",
+        "incididunt ut labore et    ",
+        "dolore magna aliqua.       ",
       ], Text.wrap(content, width: 27))
     end
   end

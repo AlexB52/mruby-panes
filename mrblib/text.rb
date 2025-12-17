@@ -23,18 +23,9 @@ module Panes
       result
     end
 
-    def self.align_line(line, width, align)
-      case align
-      when :left   then line
-      when :right  then line.rjust(width)
-      when :center then line.center(width)
-      else              line
-      end
-    end
-
     Command = Struct.new(:text, :x, :y, :bg_color, :fg_color)
 
-    def self.align_line2(line, width, align)
+    def self.align_line(line, width, align)
       case align
       when :left   then line.ljust(width)
       when :right  then line.rjust(width)
@@ -103,7 +94,7 @@ module Panes
       out.group_by(&:y).each do |y, cmds|
         if cmds.count == 1
           cmd = cmds.first
-          cmd.text = align_line2(cmd.text, width, align)
+          cmd.text = align_line(cmd.text, width, align)
         else
           line_length = cmds.sum { |cmd| cmd.text.length }
 
